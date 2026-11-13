@@ -1,13 +1,10 @@
 /**
- * SIP Wealth Calculator - Analytics & Telemetry Engine
- * 100% Free, 24/7 Real-Time Visitor & Usage Tracker
+ * SIP Wealth Calculator - 100% Real Live Analytics & Telemetry Engine
  * 
- * Features:
- * - Global Persistent Hit Counter (uses resilient free CORS counter API with failover)
- * - Unique Visitor Tracking (via persistent client fingerprinting)
- * - Action & Event Tracking (calculating SIP, step-up, lumpsum, PDF exports, link shares)
- * - Device & Source Telemetry
- * - Local & Global Aggregate Metrics
+ * Tracks genuine live visits and real calculations across all users globally.
+ * - Global hit tracking powered by real-time hits.sh SVG counter (no mock/simulated baseline)
+ * - Session-based local event logging (100% authentic user data)
+ * - Real device fingerprinting & referral tracking
  */
 
 (function (root, factory) {
@@ -19,14 +16,14 @@
 })(typeof self !== 'undefined' ? self : this, function () {
   'use strict';
 
-  const STORAGE_KEY = 'sip_analytics_store_v1';
-  const CLIENT_ID_KEY = 'sip_client_uuid_v1';
-  const NAMESPACE = 'sip-wealth-calc-akash-jraj';
+  const STORAGE_KEY = 'sip_analytics_real_store_v2';
+  const CLIENT_ID_KEY = 'sip_client_uuid_v2';
 
-  // API endpoints for free global counters
-  const COUNTER_API_BASE = 'https://api.counterapi.dev/v1/' + NAMESPACE;
+  // Real-time global counter endpoints for Akash's deployment
+  const HITS_VISITS_URL = 'https://hits.sh/akash-jraj.github.io/sip-wealth-calculator.svg';
+  const HITS_CALCS_URL = 'https://hits.sh/akash-jraj.github.io/sip-wealth-calculator-calculations.svg';
 
-  // Initialize or fetch client ID
+  // Get or generate persistent anonymous client ID
   function getClientId() {
     try {
       let id = localStorage.getItem(CLIENT_ID_KEY);
@@ -40,7 +37,7 @@
     }
   }
 
-  // Get local analytics store
+  // Get local analytics store with 100% REAL starting counts (Zero simulated baseline)
   function getLocalStore() {
     try {
       const data = localStorage.getItem(STORAGE_KEY);
@@ -51,25 +48,20 @@
       console.warn('Could not read localStorage analytics', e);
     }
 
-    // Default analytics store with seed demo metrics so admin page looks great immediately
     const now = new Date();
     const defaultData = {
       firstVisit: now.toISOString(),
       lastVisit: now.toISOString(),
-      localVisits: 1,
-      globalVisitsCached: 1420,
-      globalCalcsCached: 3890,
-      totalCalculations: 3,
-      totalWealthCalculated: 145000000,
-      events: [
-        { type: 'pageview', timestamp: new Date(Date.now() - 3600000 * 2).toISOString(), meta: { path: '/', device: 'Desktop' } },
-        { type: 'calculate', timestamp: new Date(Date.now() - 3600000).toISOString(), meta: { mode: 'sip', amount: 15000, years: 15, totalWealth: 7568580 } },
-        { type: 'calculate', timestamp: new Date(Date.now() - 1800000).toISOString(), meta: { mode: 'stepup', amount: 25000, stepup: 10, years: 20, totalWealth: 41200000 } }
-      ],
-      modesUsed: { sip: 24, stepup: 18, lumpsum: 11, goal: 9 },
-      timeHorizons: { '5': 8, '10': 19, '15': 27, '20': 34, '25+': 16 },
-      devices: { Desktop: 58, Mobile: 92, Tablet: 12 },
-      trafficSources: { Direct: 62, WhatsApp: 45, Google: 38, Social: 17 }
+      localVisits: 0,
+      globalVisits: 0,
+      globalCalcs: 0,
+      totalCalculations: 0,
+      totalWealthCalculated: 0,
+      events: [],
+      modesUsed: { sip: 0, stepup: 0, lumpsum: 0, goal: 0 },
+      timeHorizons: { '5': 0, '10': 0, '15': 0, '20': 0, '25+': 0 },
+      devices: { Desktop: 0, Mobile: 0, Tablet: 0 },
+      trafficSources: { Direct: 0, WhatsApp: 0, Google: 0, Social: 0 }
     };
 
     saveLocalStore(defaultData);
@@ -96,7 +88,7 @@
   }
 
   function getReferrerSource() {
-    const ref = document.referrer.toLowerCase();
+    const ref = (document.referrer || '').toLowerCase();
     if (!ref) return 'Direct';
     if (ref.includes('whatsapp')) return 'WhatsApp';
     if (ref.includes('google')) return 'Google';
@@ -108,71 +100,65 @@
   }
 
   /**
-   * Ping global counter API
+   * Fetch real live count from SVG counter
    */
-  async function hitGlobalCounter(action = 'visits') {
+  async function fetchHitsCount(url) {
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 3500);
+      const timeoutId = setTimeout(() => controller.abort(), 4000);
 
-      const resp = await fetch(`${COUNTER_API_BASE}/${action}/up`, {
+      const resp = await fetch(url, {
         method: 'GET',
-        headers: { 'Accept': 'application/json' },
+        cache: 'no-cache',
         signal: controller.signal
       });
       clearTimeout(timeoutId);
 
       if (resp.ok) {
-        const json = await resp.json();
-        return json.count;
+        const svgText = await resp.text();
+        const match = svgText.match(/aria-label="hits:\s*(\d+)"/i) || svgText.match(/<title>hits:\s*(\d+)<\/title>/i);
+        if (match && match[1]) {
+          return parseInt(match[1], 10);
+        }
       }
     } catch (err) {
-      // Offline or network error - fail gracefully
+      // Network offline or blocked
     }
     return null;
   }
 
   /**
-   * Fetch current global counters without incrementing
+   * Fetch real current global counters
    */
   async function fetchGlobalCounters() {
     const store = getLocalStore();
+
     try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 3500);
-
-      const [visitsResp, calcsResp] = await Promise.allSettled([
-        fetch(`${COUNTER_API_BASE}/visits`, { signal: controller.signal }),
-        fetch(`${COUNTER_API_BASE}/calcs`, { signal: controller.signal })
+      const [visits, calcs] = await Promise.all([
+        fetchHitsCount(HITS_VISITS_URL),
+        fetchHitsCount(HITS_CALCS_URL)
       ]);
-      clearTimeout(timeoutId);
 
-      if (visitsResp.status === 'fulfilled' && visitsResp.value.ok) {
-        const json = await visitsResp.value.json();
-        if (json && typeof json.count === 'number') {
-          store.globalVisitsCached = json.count;
-        }
+      if (typeof visits === 'number' && visits > 0) {
+        store.globalVisits = visits;
       }
-
-      if (calcsResp.status === 'fulfilled' && calcsResp.value.ok) {
-        const json = await calcsResp.value.json();
-        if (json && typeof json.count === 'number') {
-          store.globalCalcsCached = json.count;
-        }
+      if (typeof calcs === 'number' && calcs > 0) {
+        store.globalCalcs = calcs;
       }
 
       saveLocalStore(store);
     } catch (e) {
-      // Use cached numbers
+      // Use latest recorded store numbers
     }
+
     return {
-      visits: store.globalVisitsCached || 1420,
-      calculations: store.globalCalcsCached || 3890
+      visits: Math.max(store.globalVisits || 0, store.localVisits || 0),
+      calculations: Math.max(store.globalCalcs || 0, store.totalCalculations || 0)
     };
   }
 
   /**
-   * Record a Page Visit
+   * Record a Real Page Visit
    */
   async function recordPageView(pageName = '/') {
     const store = getLocalStore();
@@ -193,13 +179,12 @@
     });
 
     if (store.events.length > 50) store.events.pop();
-
     saveLocalStore(store);
 
-    // Call background global counter
-    hitGlobalCounter('visits').then(count => {
-      if (count) {
-        store.globalVisitsCached = count;
+    // Increment real hits on server
+    fetchHitsCount(HITS_VISITS_URL).then(count => {
+      if (typeof count === 'number') {
+        store.globalVisits = count;
         saveLocalStore(store);
       }
     });
@@ -208,7 +193,7 @@
   }
 
   /**
-   * Record a Calculation Event
+   * Record a Real Calculation Event
    */
   function recordCalculation(mode, params, result) {
     const store = getLocalStore();
@@ -244,10 +229,10 @@
     if (store.events.length > 50) store.events.pop();
     saveLocalStore(store);
 
-    // Ping global counter
-    hitGlobalCounter('calcs').then(count => {
-      if (count) {
-        store.globalCalcsCached = count;
+    // Increment real calculation hit on server
+    fetchHitsCount(HITS_CALCS_URL).then(count => {
+      if (typeof count === 'number') {
+        store.globalCalcs = count;
         saveLocalStore(store);
       }
     });
@@ -271,7 +256,7 @@
   }
 
   /**
-   * Export all analytics data as JSON file
+   * Export analytics data as JSON
    */
   function exportAnalyticsJSON() {
     const data = getLocalStore();
@@ -279,16 +264,17 @@
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `sip-calculator-analytics-${new Date().toISOString().slice(0, 10)}.json`;
+    a.download = `sip-calculator-analytics-live-${new Date().toISOString().slice(0, 10)}.json`;
     a.click();
     URL.revokeObjectURL(url);
   }
 
   /**
-   * Clear local telemetry
+   * Clear all local session data to start 100% fresh
    */
   function resetLocalAnalytics() {
     localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem('sip_analytics_store_v1'); // Clean legacy
     return getLocalStore();
   }
 
