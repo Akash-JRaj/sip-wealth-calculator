@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart SIP Calculator - Mutual Fund Wealth & Step-Up Planner | Free 24/7</title>
+  
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="Calculate your mutual fund SIP returns with India's most advanced, free SIP calculator. Features Step-Up SIP, inflation-adjusted returns, lumpsum, target goal solver, and instant PDF/CSV reports.">
+  <meta name="keywords" content="SIP calculator, step-up SIP, mutual fund calculator, SIP vs FD, inflation adjusted SIP, wealth planner, target goal SIP calculator">
+  <meta name="author" content="Akash Jayaraj">
+  <meta name="theme-color" content="#090d16">
+  
+  <!-- Open Graph / Social Sharing -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Smart SIP Calculator - Advanced Mutual Fund Wealth Planner">
+  <meta property="og:description" content="Free, 24/7 SIP calculator with step-up compounding, inflation adjustments, and visual growth projections.">
+  <meta property="og:image" content="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=1200&auto=format&fit=crop&q=80">
+  
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Smart SIP Calculator - Advanced Mutual Fund Wealth Planner">
+  <meta name="twitter:description" content="Free, 24/7 SIP calculator with step-up compounding, inflation adjustments, and visual growth projections.">
+
+  <!-- JSON-LD Structured Data for Rich Search Results -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Smart SIP Calculator",
+    "applicationCategory": "FinanceApplication",
+    "operatingSystem": "All",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "featureList": [
+      "Standard Monthly SIP Calculator",
+      "Annual Step-Up (Top-Up) Compounding",
+      "Inflation-Adjusted Real Purchasing Power",
+      "Target Goal Reverse Solver",
+      "Asset Class Benchmark Comparison (SIP vs FD vs Gold)",
+      "Interactive Chart Visualizer",
+      "Free PDF and CSV Investment Schedule Export"
+    ]
+  }
+  </script>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="css/styles.css">
+  
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="min-h-screen bg-[#090d16] text-slate-100 flex flex-col selection:bg-indigo-500 selection:text-white">
+
+  <!-- ================= TOP HEADER NAVIGATION ================= -->
+  <header class="sticky top-0 z-40 backdrop-blur-md bg-[#090d16]/80 border-b border-slate-800/80">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      
+      <!-- Brand Logo -->
+      <a href="index.html" class="flex items-center gap-3 group">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-emerald-400 p-0.5 shadow-lg shadow-indigo-500/20 group-hover:scale-105 transition-transform">
+          <div class="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center">
+            <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+            </svg>
+          </div>
+        </div>
+        <div>
+          <span class="text-lg font-bold tracking-tight text-white flex items-center gap-1.5">
+            Smart<span class="text-emerald-400">SIP</span>
+            <span class="text-[10px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">PRO</span>
+          </span>
+          <p class="text-[11px] text-slate-400 font-medium hidden sm:block">Intelligent Wealth & Compounding Planner</p>
+        </div>
+      </a>
+
+      <!-- Header Center: Live Activity Badge -->
+      <a href="analytics.html" class="hidden md:flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-slate-900/90 border border-slate-700/80 hover:border-emerald-500/50 transition-all text-xs text-slate-300 group">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 pulse-dot"></span>
+        <span><strong id="globalVisitsCounter" class="text-emerald-400 font-semibold">1,420+</strong> visits</span>
+        <span class="text-slate-600">|</span>
+        <span class="text-slate-400 group-hover:text-indigo-400 transition-colors flex items-center gap-1">
+          Live Analytics
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+        </span>
+      </a>
+
+      <!-- Header Right: Currency Selector & Analytics Button -->
+      <div class="flex items-center gap-3">
+        <!-- Currency Select -->
+        <div class="relative">
+          <select id="currencySelector" class="bg-slate-900 border border-slate-700/80 text-xs sm:text-sm font-semibold rounded-lg px-2.5 py-1.5 text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer">
+            <option value="INR">₹ INR (India)</option>
+            <option value="USD">$ USD (Global)</option>
+            <option value="EUR">€ EUR (Europe)</option>
+            <option value="GBP">£ GBP (UK)</option>
+          </select>
+        </div>
+
+        <!-- Analytics Dashboard Button -->
+        <a href="analytics.html" class="flex items-center gap-1.5 text-xs sm:text-sm font-semibold px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white shadow-md shadow-indigo-600/20 transition-all">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+          </svg>
+          <span class="hidden sm:inline">Analytics</span>
+        </a>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ================= HERO SECTION ================= -->
+  <section class="relative pt-8 pb-4 text-center max-w-4xl mx-auto px-4 sm:px-6">
+    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold mb-3">
+      <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"></path>
+      </svg>
+      The Most Powerful Wealth & Step-Up Planner Online
+    </div>
+    <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight text-white mb-3">
+      Build Unstoppable Wealth with <span class="bg-gradient-to-r from-indigo-400 via-emerald-300 to-teal-400 bg-clip-text text-transparent">Smart Compounding</span>
+    </h1>
+    <p class="text-sm sm:text-base text-slate-400 max-w-2xl mx-auto">
+      Calculate realistic returns with annual step-up compounding, inflation adjustments, and visual roadmaps. Free forever, running 24/7.
+    </p>
+
+    <!-- Top Leaderboard Ad Slot / Partner Banner -->
+    <div class="ad-slot-container max-w-3xl mt-6">
+      <span class="ad-label">Sponsored Partner</span>
+      <div id="topAdSlot" class="w-full flex items-center justify-between p-3 rounded-lg bg-slate-900/80 border border-slate-800">
+        <div class="flex items-center gap-3 text-left">
+          <div class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xs">
+            0%
+          </div>
+          <div>
+            <div class="text-xs font-semibold text-white">Invest in Direct Mutual Funds with Zero Brokerage</div>
+            <div class="text-[11px] text-slate-400">Save up to 1.5% extra every year in direct plans vs regular mutual funds</div>
+          </div>
+        </div>
+        <a href="https://zerodha.com" target="_blank" rel="noopener" class="px-3 py-1.5 rounded-md bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-bold transition-colors whitespace-nowrap">
+          Open Account
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= CALCULATOR TABS & MAIN WORKSPACE ================= -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex-grow w-full">
+
+    <!-- Mode Tabs Switcher -->
+    <div class="flex items-center justify-center mb-8 tab-buttons-container">
+      <div class="inline-flex p-1.5 rounded-2xl bg-slate-900/90 border border-slate-800 shadow-xl overflow-x-auto max-w-full">
+        <button id="tabSIP" class="tab-btn active px-4 py-2.5 rounded-xl font-semibold text-xs sm:text-sm transition-all duration-200 bg-indigo-600 text-white shadow-lg shadow-indigo-500/25 flex items-center gap-2 whitespace-nowrap">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          Standard Monthly SIP
+        </button>
+        <button id="tabStepUp" class="tab-btn px-4 py-2.5 rounded-xl font-medium text-xs sm:text-sm transition-all duration-200 text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 flex items-center gap-2 whitespace-nowrap">
+          <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+          Step-Up (Top-Up) SIP
+        </button>
+        <button id="tabLumpsum" class="tab-btn px-4 py-2.5 rounded-xl font-medium text-xs sm:text-sm transition-all duration-200 text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 flex items-center gap-2 whitespace-nowrap">
+          <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+          Lumpsum One-Time
+        </button>
+        <button id="tabGoal" class="tab-btn px-4 py-2.5 rounded-xl font-medium text-xs sm:text-sm transition-all duration-200 text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 flex items-center gap-2 whitespace-nowrap">
+          <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          Target Goal Solver
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Dual Grid Layout -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+
+      <!-- ================= LEFT COLUMN: CONTROLS & INPUTS ================= -->
+      <div class="lg:col-span-6 space-y-6">
+        
+        <div class="glass-panel-elevated p-6 sm:p-7 rounded-2xl border border-slate-800">
+          
+          <div class="flex items-center justify-between pb-5 border-b border-slate-800/80 mb-6">
+            <h2 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
+              Investment Parameters
+            </h2>
+            <div class="text-xs text-slate-400">Instant Realtime Recalculation</div>
+          </div>
+
+          <!-- Quick Presets -->
+          <div class="mb-6">
+            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Popular SIP Presets</label>
+            <div class="grid grid-cols-4 gap-2">
+              <button id="preset5k" class="py-1.5 px-2 rounded-lg bg-slate-800/70 hover:bg-indigo-600/30 text-xs font-medium text-slate-300 hover:text-indigo-300 border border-slate-700/60 transition-colors">₹5,000</button>
+              <button id="preset10k" class="py-1.5 px-2 rounded-lg bg-slate-800/70 hover:bg-indigo-600/30 text-xs font-medium text-slate-300 hover:text-indigo-300 border border-slate-700/60 transition-colors">₹10,000</button>
+              <button id="preset25k" class="py-1.5 px-2 rounded-lg bg-slate-800/70 hover:bg-indigo-600/30 text-xs font-medium text-slate-300 hover:text-indigo-300 border border-slate-700/60 transition-colors">₹25,000</button>
+              <button id="preset50k" class="py-1.5 px-2 rounded-lg bg-slate-800/70 hover:bg-indigo-600/30 text-xs font-medium text-slate-300 hover:text-indigo-300 border border-slate-700/60 transition-colors">₹50,000</button>
+            </div>
+          </div>
+
+          <!-- INPUT 1: Monthly Investment (SIP & Step-Up) -->
+          <div id="sipInputWrapper" class="space-y-3 mb-6">
+            <div class="flex items-center justify-between">
+              <label for="monthlyInput" class="text-sm font-medium text-slate-300 flex items-center gap-1.5">
+                Monthly Investment
+                <span class="text-xs text-slate-500">(Installment)</span>
+              </label>
+              <div class="relative w-36 sm:w-44">
+                <input id="monthlyInput" type="number" min="500" max="500000" step="500" value="15000"
+                  class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-right font-bold text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              </div>
+            </div>
+            <input id="monthlySlider" type="range" min="500" max="100000" step="500" value="15000">
+            <div class="flex justify-between text-[11px] text-slate-500">
+              <span>Min: ₹500</span>
+              <span>₹25k</span>
+              <span>₹50k</span>
+              <span>Max: ₹1,00,000</span>
+            </div>
+          </div>
+
+          <!-- INPUT: Step-Up Percentage (Visible in Step-Up Mode) -->
+          <div id="stepUpInputWrapper" class="space-y-3 mb-6 hidden p-4 rounded-xl bg-indigo-950/20 border border-indigo-500/30">
+            <div class="flex items-center justify-between">
+              <label for="stepUpInput" class="text-sm font-semibold text-indigo-300 flex items-center gap-1.5">
+                Annual Step-Up (% Per Year)
+                <span class="text-[11px] text-indigo-400/80">Increase as your salary grows</span>
+              </label>
+              <div class="relative w-28">
+                <input id="stepUpInput" type="number" min="1" max="50" step="1" value="10"
+                  class="w-full bg-slate-900 border border-indigo-500/50 rounded-xl px-3 py-1.5 text-right font-bold text-emerald-400 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              </div>
+            </div>
+            <input id="stepUpSlider" type="range" min="1" max="50" step="1" value="10">
+            <div class="flex justify-between text-[11px] text-slate-500">
+              <span>1%</span>
+              <span class="text-emerald-400 font-semibold">10% Recommended</span>
+              <span>25%</span>
+              <span>50%</span>
+            </div>
+          </div>
+
+          <!-- INPUT: Lumpsum Principal (Visible in Lumpsum Mode) -->
+          <div id="lumpsumInputWrapper" class="space-y-3 mb-6 hidden">
+            <div class="flex items-center justify-between">
+              <label for="lumpsumInput" class="text-sm font-medium text-slate-300">
+                Total Lumpsum Investment
+              </label>
+              <div class="relative w-40">
+                <input id="lumpsumInput" type="number" min="5000" max="10000000" step="5000" value="100000"
+                  class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-right font-bold text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              </div>
+            </div>
+            <input id="lumpsumSlider" type="range" min="5000" max="2500000" step="5000" value="100000">
+            <div class="flex justify-between text-[11px] text-slate-500">
+              <span>₹5k</span>
+              <span>₹5 Lakhs</span>
+              <span>₹15 Lakhs</span>
+              <span>₹25 Lakhs</span>
+            </div>
+          </div>
+
+          <!-- INPUT: Target Goal (Visible in Goal Mode) -->
+          <div id="goalInputWrapper" class="space-y-3 mb-6 hidden">
+            <div class="flex items-center justify-between">
+              <label for="goalInput" class="text-sm font-medium text-slate-300">
+                Target Wealth Goal
+              </label>
+              <div class="relative w-40">
+                <input id="goalInput" type="number" min="100000" max="100000000" step="50000" value="10000000"
+                  class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-right font-bold text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              </div>
+            </div>
+            <input id="goalSlider" type="range" min="100000" max="50000000" step="100000" value="10000000">
+            <div class="flex justify-between text-[11px] text-slate-500">
+              <span>₹1 Lakh</span>
+              <span>₹50 Lakhs</span>
+              <span class="text-emerald-400 font-semibold">₹1 Crore</span>
+              <span>₹5 Crore</span>
+            </div>
+          </div>
+
+          <!-- INPUT 2: Expected Return Rate (%) -->
+          <div class="space-y-3 mb-6">
+            <div class="flex items-center justify-between">
+              <div>
+                <label for="rateInput" class="text-sm font-medium text-slate-300 block">
+                  Expected Return Rate (p.a)
+                </label>
+                <span class="text-[11px] text-slate-400">Equity Funds historical average: 12% - 15%</span>
+              </div>
+              <div class="relative w-28">
+                <input id="rateInput" type="number" min="1" max="35" step="0.5" value="12"
+                  class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-right font-bold text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              </div>
+            </div>
+            <input id="rateSlider" type="range" min="1" max="30" step="0.5" value="12">
+            <div class="flex justify-between text-[11px] text-slate-500">
+              <span>1%</span>
+              <span class="text-blue-400">FD (7%)</span>
+              <span class="text-emerald-400 font-semibold">Nifty 50 (12%)</span>
+              <span class="text-amber-400">Midcap (15%)</span>
+              <span>30%</span>
+            </div>
+          </div>
+
+          <!-- INPUT 3: Investment Duration (Years) -->
+          <div class="space-y-3 mb-6">
+            <div class="flex items-center justify-between">
+              <div>
+                <label for="yearsInput" class="text-sm font-medium text-slate-300 block">
+                  Investment Duration
+                </label>
+                <span class="text-[11px] text-slate-400">Longer horizon exponentially supercharges compounding</span>
+              </div>
+              <div class="relative w-28">
+                <input id="yearsInput" type="number" min="1" max="40" step="1" value="15"
+                  class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-right font-bold text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              </div>
+            </div>
+            <input id="yearsSlider" type="range" min="1" max="35" step="1" value="15">
+            <div class="flex justify-between text-[11px] text-slate-500">
+              <span>1 Yr</span>
+              <span>5 Yrs</span>
+              <span class="text-indigo-400 font-semibold">15 Yrs</span>
+              <span>25 Yrs</span>
+              <span>35 Yrs</span>
+            </div>
+          </div>
+
+          <!-- Inflation Adjustment Toggle -->
+          <div class="pt-4 border-t border-slate-800">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input id="inflationToggle" type="checkbox" class="sr-only peer">
+                  <div class="w-11 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
+                </label>
+                <span class="text-xs sm:text-sm font-semibold text-slate-300">Adjust for Inflation</span>
+              </div>
+              <span class="text-[11px] text-amber-400/90 font-medium">Reveals real future purchasing power</span>
+            </div>
+
+            <!-- Inflation Slider -->
+            <div id="inflationSection" class="mt-4 space-y-2 hidden p-3.5 rounded-xl bg-amber-950/20 border border-amber-500/30">
+              <div class="flex items-center justify-between text-xs">
+                <span class="text-amber-300 font-medium">Expected Inflation Rate</span>
+                <input id="inflationInput" type="number" min="1" max="15" step="0.5" value="6"
+                  class="w-20 bg-slate-900 border border-amber-500/40 rounded-lg px-2 py-1 text-right font-bold text-amber-400">
+              </div>
+              <input id="inflationSlider" type="range" min="1" max="12" step="0.5" value="6">
+              <div class="flex justify-between text-[10px] text-slate-500">
+                <span>1% (Deflationary)</span>
+                <span class="text-amber-400 font-semibold">6% (India RBI Avg)</span>
+                <span>12%</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Target Goal Required Monthly SIP Pill (shows only in Goal mode) -->
+        <div id="monthlyNeededContainer" class="hidden glass-panel-elevated p-5 rounded-2xl border border-cyan-500/40 bg-cyan-950/20">
+          <div class="flex items-center justify-between">
+            <div>
+              <div class="text-xs text-cyan-300 font-semibold uppercase tracking-wider">Required Monthly SIP</div>
+              <div class="text-xs text-slate-400">To achieve your target goal in time</div>
+            </div>
+            <div id="outMonthlyNeeded" class="text-2xl font-extrabold text-cyan-400">
+              ₹0/mo
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ================= RIGHT COLUMN: RESULTS & CHARTS ================= -->
+      <div class="lg:col-span-6 space-y-6">
+
+        <!-- PRIMARY WEALTH HERO CARD -->
+        <div class="glass-panel-elevated p-6 sm:p-7 rounded-2xl border border-slate-800 glow-primary relative overflow-hidden">
+          
+          <div class="flex items-center justify-between mb-4">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Total Projected Wealth</span>
+            <span id="outWealthMultiplier" class="text-xs font-extrabold px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+              3.4x Multiplier
+            </span>
+          </div>
+
+          <!-- Total Wealth Number -->
+          <div id="outTotalValue" class="text-4xl sm:text-5xl font-black text-white tracking-tight mb-6">
+            ₹0
+          </div>
+
+          <!-- Split Summary Grid -->
+          <div class="grid grid-cols-2 gap-4 pt-4 border-t border-slate-800/80">
+            <div class="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800">
+              <div class="text-xs text-slate-400 font-medium mb-1 flex items-center gap-1.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
+                Total Invested Capital
+              </div>
+              <div id="outInvested" class="text-lg sm:text-xl font-bold text-slate-200">
+                ₹0
+              </div>
+            </div>
+
+            <div class="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800">
+              <div class="text-xs text-slate-400 font-medium mb-1 flex items-center gap-1.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                Estimated Wealth Gain
+              </div>
+              <div id="outReturns" class="text-lg sm:text-xl font-bold text-emerald-400">
+                +₹0
+              </div>
+            </div>
+          </div>
+
+          <!-- Real Inflation Adjusted Value Card (Conditional) -->
+          <div id="realValueCard" class="hidden mt-4 p-3.5 rounded-xl bg-amber-950/30 border border-amber-500/40 flex items-center justify-between">
+            <div>
+              <div class="text-xs font-semibold text-amber-300">Real Purchasing Power</div>
+              <div class="text-[11px] text-slate-400">Worth in today's purchasing power</div>
+            </div>
+            <div id="outRealValue" class="text-base sm:text-lg font-bold text-amber-400">
+              ₹0
+            </div>
+          </div>
+
+          <!-- Donut Visualizer -->
+          <div class="mt-6 pt-6 border-t border-slate-800/80">
+            <div class="h-56 relative flex items-center justify-center">
+              <canvas id="donutChart"></canvas>
+            </div>
+          </div>
+
+          <!-- Action Toolbar (Share, WhatsApp, PDF, CSV) -->
+          <div class="mt-6 pt-5 border-t border-slate-800/80 grid grid-cols-2 sm:grid-cols-4 gap-2.5 no-print">
+            <button id="btnShareLink" class="py-2 px-3 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-xs font-semibold text-slate-200 border border-slate-700 flex items-center justify-center gap-1.5 transition-colors">
+              <svg class="w-3.5 h-3.5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+              Copy Link
+            </button>
+            <button id="btnShareWhatsApp" class="py-2 px-3 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-xs font-semibold text-emerald-300 border border-emerald-500/40 flex items-center justify-center gap-1.5 transition-colors">
+              <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
+              WhatsApp
+            </button>
+            <button id="btnDownloadPDF" class="py-2 px-3 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-xs font-semibold text-slate-200 border border-slate-700 flex items-center justify-center gap-1.5 transition-colors">
+              <svg class="w-3.5 h-3.5 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+              Print / PDF
+            </button>
+            <button id="btnDownloadCSV" class="py-2 px-3 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-xs font-semibold text-slate-200 border border-slate-700 flex items-center justify-center gap-1.5 transition-colors">
+              <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+              Export CSV
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ================= MULTI-YEAR GROWTH TRAJECTORY CHART ================= -->
+    <div class="mt-10 glass-panel-elevated p-6 sm:p-7 rounded-2xl border border-slate-800">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-800/80 gap-2 mb-6">
+        <div>
+          <h2 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+            Multi-Year Wealth Trajectory
+          </h2>
+          <p class="text-xs text-slate-400">Notice how returns dwarf principal invested in the later compounding years</p>
+        </div>
+        <div class="flex items-center gap-4 text-xs font-medium text-slate-400">
+          <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-[#6366F1]"></span> Invested</span>
+          <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-[#10B981]"></span> Wealth Gain</span>
+        </div>
+      </div>
+
+      <div class="h-72 sm:h-80 w-full">
+        <canvas id="growthChart"></canvas>
+      </div>
+    </div>
+
+    <!-- ================= WEALTH MILESTONES ROADMAP ================= -->
+    <div class="mt-10 glass-panel-elevated p-6 sm:p-7 rounded-2xl border border-slate-800">
+      <div class="pb-4 border-b border-slate-800/80 mb-5">
+        <h2 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+          Your Wealth Milestone Roadmap
+        </h2>
+        <p class="text-xs text-slate-400">Estimated year you unlock major financial independence targets</p>
+      </div>
+
+      <div id="milestonesContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+
+    <!-- IN-CONTENT MID AD SLOT / AFFILIATE UNIT -->
+    <div class="ad-slot-container max-w-4xl my-8">
+      <span class="ad-label">Partner Feature</span>
+      <div class="w-full p-4 rounded-xl bg-gradient-to-r from-slate-900 to-indigo-950/40 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <div class="text-sm font-bold text-white flex items-center gap-2">
+            🚀 Supercharge Your SIP with Index Funds
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 font-semibold">99.8% Beat Active Funds</span>
+          </div>
+          <div class="text-xs text-slate-400 mt-1">
+            Over a 15-year horizon, passive low-cost Nifty 50 and S&P 500 index funds historically outperform 85%+ of actively managed mutual funds.
+          </div>
+        </div>
+        <a href="https://groww.in" target="_blank" rel="noopener" class="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition-colors whitespace-nowrap self-start sm:self-center">
+          Compare Top Funds
+        </a>
+      </div>
+    </div>
+
+    <!-- ================= BENCHMARK COMPARISON TABLE (SIP vs FD vs Gold vs Cash) ================= -->
+    <div class="mt-10 glass-panel-elevated p-6 sm:p-7 rounded-2xl border border-slate-800">
+      <div class="pb-4 border-b border-slate-800/80 mb-4">
+        <h2 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-cyan-400"></span>
+          The Opportunity Cost: Mutual Fund SIP vs Traditional Assets
+        </h2>
+        <p class="text-xs text-slate-400">Comparing your planned monthly investment across different asset classes</p>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="border-b border-slate-800 text-[11px] font-bold uppercase tracking-wider text-slate-400">
+              <th class="py-3 px-4">Asset Class</th>
+              <th class="py-3 px-4 text-right">Avg Rate (p.a)</th>
+              <th class="py-3 px-4 text-right">Maturity Value</th>
+              <th class="py-3 px-4 text-right">Wealth Gain</th>
+              <th class="py-3 px-4 text-right text-amber-400">Real Purchasing Power</th>
+            </tr>
+          </thead>
+          <tbody id="comparisonTableBody">
+            <!-- Rendered dynamically -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ================= YEAR-BY-YEAR AMORTIZATION SCHEDULE ================= -->
+    <div class="mt-10 glass-panel-elevated p-6 sm:p-7 rounded-2xl border border-slate-800">
+      <div class="flex items-center justify-between pb-4 border-b border-slate-800/80 mb-4">
+        <div>
+          <h2 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-indigo-400"></span>
+            Year-by-Year Growth Breakdown
+          </h2>
+          <p class="text-xs text-slate-400">Detailed schedule of deposits, returns earned, and closing portfolio balance</p>
+        </div>
+        <button onclick="document.getElementById('btnDownloadCSV').click()" class="no-print text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-colors">
+          Download CSV
+        </button>
+      </div>
+
+      <div class="overflow-x-auto max-h-96">
+        <table class="w-full text-left border-collapse">
+          <thead class="sticky top-0 bg-slate-900/95 backdrop-blur z-10">
+            <tr class="border-b border-slate-800 text-[11px] font-bold uppercase tracking-wider text-slate-400">
+              <th class="py-2.5 px-3 text-center">Year</th>
+              <th class="py-2.5 px-3 text-right">Yearly Deposit</th>
+              <th class="py-2.5 px-3 text-right">Total Invested</th>
+              <th class="py-2.5 px-3 text-right text-emerald-400">Interest Earned</th>
+              <th class="py-2.5 px-3 text-right">Closing Portfolio</th>
+            </tr>
+          </thead>
+          <tbody id="scheduleTableBody">
+            <!-- Rendered dynamically -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ================= SEO CONTENT & EDUCATIONAL GUIDE ================= -->
+    <section class="mt-14 max-w-4xl mx-auto space-y-8 no-print">
+      
+      <div class="text-center">
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-white mb-2">Everything You Need to Know About SIP</h2>
+        <p class="text-sm text-slate-400">The mathematics, strategy, and best practices for long-term compounding</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        
+        <div class="p-6 rounded-2xl bg-slate-900/60 border border-slate-800">
+          <h3 class="text-base font-bold text-white mb-2 flex items-center gap-2">
+            <span class="text-emerald-400">💡</span> What is a Systematic Investment Plan (SIP)?
+          </h3>
+          <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+            A Systematic Investment Plan (SIP) allows you to invest a fixed sum regularly into mutual funds. It inculcates financial discipline, removes market timing emotion, and leverages <strong>Rupee Cost Averaging</strong>—buying more fund units when prices are low and fewer units when prices are high.
+          </p>
+        </div>
+
+        <div class="p-6 rounded-2xl bg-slate-900/60 border border-slate-800">
+          <h3 class="text-base font-bold text-white mb-2 flex items-center gap-2">
+            <span class="text-indigo-400">🚀</span> Why Step-Up (Top-Up) SIP is a Game Changer
+          </h3>
+          <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+            Most people keep their SIP amount constant for 15 years even though their salary increases annually by 8-15%. By stepping up your SIP by just <strong>10% annually</strong>, you can often accumulate <strong>2x to 3x more wealth</strong> over a 20-year career without feeling any financial pinch!
+          </p>
+        </div>
+
+        <div class="p-6 rounded-2xl bg-slate-900/60 border border-slate-800">
+          <h3 class="text-base font-bold text-white mb-2 flex items-center gap-2">
+            <span class="text-amber-400">📉</span> The Hidden Danger of Inflation
+          </h3>
+          <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+            ₹1 Crore in 20 years sounds like a lot of money, but at 6% annual inflation, ₹1 Crore in 20 years will have the purchasing power of only ~₹31 Lakhs today. That's why our calculator includes real purchasing power analysis so you plan realistically.
+          </p>
+        </div>
+
+        <div class="p-6 rounded-2xl bg-slate-900/60 border border-slate-800">
+          <h3 class="text-base font-bold text-white mb-2 flex items-center gap-2">
+            <span class="text-cyan-400">📐</span> SIP Calculation Mathematical Formula
+          </h3>
+          <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+            The mutual fund industry calculates SIP maturity using the Annuity Due compound interest formula:
+            <br>
+            <code class="block mt-2 p-2 rounded bg-slate-950 font-mono text-[11px] text-emerald-400">
+              M = P × [((1 + i)ⁿ - 1) / i] × (1 + i)
+            </code>
+            Where <em>P</em> is monthly installment, <em>i</em> is periodic monthly rate, and <em>n</em> is total months.
+          </p>
+        </div>
+
+      </div>
+
+      <!-- FAQ Accordion -->
+      <div class="glass-panel p-6 sm:p-7 rounded-2xl border border-slate-800">
+        <h3 class="text-lg font-bold text-white mb-4">Frequently Asked Questions (FAQs)</h3>
+        
+        <div class="space-y-4">
+          <details class="group bg-slate-900/50 p-4 rounded-xl border border-slate-800/80 cursor-pointer">
+            <summary class="font-semibold text-sm text-slate-200 flex justify-between items-center list-none">
+              <span>What is the minimum amount required to start a SIP?</span>
+              <span class="text-indigo-400 group-open:rotate-180 transition-transform">▼</span>
+            </summary>
+            <p class="text-xs sm:text-sm text-slate-400 mt-2.5 leading-relaxed">
+              Most mutual fund houses in India permit starting a SIP with as little as ₹500 or ₹1,000 per month. Some micro-SIP schemes even start at ₹100 per month.
+            </p>
+          </details>
+
+          <details class="group bg-slate-900/50 p-4 rounded-xl border border-slate-800/80 cursor-pointer">
+            <summary class="font-semibold text-sm text-slate-200 flex justify-between items-center list-none">
+              <span>Can I stop, pause, or change my SIP amount anytime?</span>
+              <span class="text-indigo-400 group-open:rotate-180 transition-transform">▼</span>
+            </summary>
+            <p class="text-xs sm:text-sm text-slate-400 mt-2.5 leading-relaxed">
+              Yes! SIPs are completely flexible. There are no penalty charges for pausing or modifying an ongoing SIP in open-ended mutual funds.
+            </p>
+          </details>
+
+          <details class="group bg-slate-900/50 p-4 rounded-xl border border-slate-800/80 cursor-pointer">
+            <summary class="font-semibold text-sm text-slate-200 flex justify-between items-center list-none">
+              <span>What is the average expected return for equity mutual funds in India?</span>
+              <span class="text-indigo-400 group-open:rotate-180 transition-transform">▼</span>
+            </summary>
+            <p class="text-xs sm:text-sm text-slate-400 mt-2.5 leading-relaxed">
+              Historically over 10-15 year periods, Indian broad market indices like the Nifty 50 and BSE Sensex have compounded between 12% to 14% CAGR, while actively managed mid-cap and small-cap funds have generated 14% to 18% CAGR.
+            </p>
+          </details>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="mt-16 border-t border-slate-800/80 bg-slate-950/60 py-10 no-print">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-6">
+      
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-emerald-400 font-bold text-xs">
+          SIP
+        </div>
+        <div class="text-xs text-slate-400">
+          Built with ❤️ for smart investors. Running 24/7 on global free cloud infrastructure.
+        </div>
+      </div>
+
+      <div class="flex items-center gap-6 text-xs text-slate-400 font-medium">
+        <a href="analytics.html" class="hover:text-emerald-400 transition-colors flex items-center gap-1">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+          Live Visitor Analytics
+        </a>
+        <a href="https://github.com/Akash-JRaj" target="_blank" rel="noopener" class="hover:text-white transition-colors">
+          GitHub Profile
+        </a>
+        <span class="text-slate-600">|</span>
+        <span class="text-slate-500 text-[11px]">© 2024-2026 Akash Jayaraj. All rights reserved.</span>
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- ================= TOAST NOTIFICATION ================= -->
+  <div id="toastNotification" class="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 px-4 py-3 rounded-xl bg-slate-900/95 border border-slate-700 text-white text-xs font-semibold shadow-2xl transition-all duration-300 opacity-0 pointer-events-none translate-y-4">
+    <svg class="w-4 h-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+    <span id="toastMessage">Success</span>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/calculator.js"></script>
+  <script src="js/analytics.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/ads-config.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

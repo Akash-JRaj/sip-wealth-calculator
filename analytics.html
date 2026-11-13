@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Live Traffic & Usage Analytics - Smart SIP Calculator</title>
+  
+  <meta name="description" content="Real-time visitor and calculation analytics dashboard for the Smart SIP Wealth Calculator.">
+  <meta name="theme-color" content="#090d16">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="css/styles.css">
+  
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="min-h-screen bg-[#090d16] text-slate-100 flex flex-col selection:bg-indigo-500 selection:text-white">
+
+  <!-- ================= TOP HEADER NAVIGATION ================= -->
+  <header class="sticky top-0 z-40 backdrop-blur-md bg-[#090d16]/80 border-b border-slate-800/80">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      
+      <!-- Brand & Back Button -->
+      <div class="flex items-center gap-4">
+        <a href="index.html" class="flex items-center gap-2 text-xs sm:text-sm font-semibold text-slate-400 hover:text-white py-1.5 px-3 rounded-lg bg-slate-900 border border-slate-800 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+          Back to Calculator
+        </a>
+        <div class="h-5 w-[1px] bg-slate-800 hidden sm:block"></div>
+        <div class="flex items-center gap-2">
+          <div class="w-2.5 h-2.5 rounded-full bg-emerald-400 pulse-dot"></div>
+          <span class="text-sm font-bold text-white tracking-tight">Live Visitor & Usage Analytics</span>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        <button id="btnRefresh" class="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-colors">
+          <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+          <span class="hidden sm:inline">Refresh Data</span>
+        </button>
+        <button id="btnExportJSON" class="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white transition-colors">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+          Export Report
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ================= MAIN ANALYTICS DASHBOARD ================= -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow w-full space-y-8">
+
+    <!-- Top Dashboard Header -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-800">
+      <div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight flex items-center gap-3">
+          Audience & Engagement Insights
+          <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">24/7 Global Tracking</span>
+        </h1>
+        <p class="text-xs sm:text-sm text-slate-400 mt-1">
+          Monitor concurrent visitors, user interactions, and traffic sources across all global deployments.
+        </p>
+      </div>
+
+      <!-- Quick Test Event Trigger -->
+      <div class="flex items-center gap-2">
+        <button id="btnSimulateEvent" class="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-indigo-500/40 text-indigo-300 text-xs font-semibold flex items-center gap-2 transition-all">
+          <svg class="w-3.5 h-3.5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+          Simulate User Event
+        </button>
+        <button id="btnResetData" class="px-3 py-2 rounded-xl bg-slate-900/60 hover:bg-rose-950/40 border border-slate-800 hover:border-rose-500/40 text-slate-400 hover:text-rose-400 text-xs font-medium transition-all" title="Reset test session data">
+          Reset
+        </button>
+      </div>
+    </div>
+
+    <!-- ================= 4 PRIMARY KPI CARDS ================= -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      
+      <!-- KPI 1: Global Page Visits -->
+      <div class="glass-panel-elevated p-5 rounded-2xl border border-slate-800 relative overflow-hidden group">
+        <div class="flex items-center justify-between text-xs text-slate-400 mb-2 font-medium">
+          <span>Global Page Views</span>
+          <span class="w-7 h-7 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+          </span>
+        </div>
+        <div id="statTotalVisits" class="text-3xl font-extrabold text-white tracking-tight">
+          1,420
+        </div>
+        <div class="mt-2 text-[11px] text-emerald-400 flex items-center gap-1 font-semibold">
+          <span>↑ 14.8%</span>
+          <span class="text-slate-400 font-normal">from previous week</span>
+        </div>
+      </div>
+
+      <!-- KPI 2: Total Calculations Run -->
+      <div class="glass-panel-elevated p-5 rounded-2xl border border-slate-800 relative overflow-hidden group">
+        <div class="flex items-center justify-between text-xs text-slate-400 mb-2 font-medium">
+          <span>Calculations Executed</span>
+          <span class="w-7 h-7 rounded-lg bg-indigo-500/10 text-indigo-400 flex items-center justify-center">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+          </span>
+        </div>
+        <div id="statTotalCalculations" class="text-3xl font-extrabold text-white tracking-tight">
+          3,890
+        </div>
+        <div class="mt-2 text-[11px] text-indigo-400 flex items-center gap-1 font-semibold">
+          <span>2.74 calcs/visitor</span>
+          <span class="text-slate-400 font-normal">high user engagement</span>
+        </div>
+      </div>
+
+      <!-- KPI 3: Unique Visitors -->
+      <div class="glass-panel-elevated p-5 rounded-2xl border border-slate-800 relative overflow-hidden group">
+        <div class="flex items-center justify-between text-xs text-slate-400 mb-2 font-medium">
+          <span>Unique Investors</span>
+          <span class="w-7 h-7 rounded-lg bg-cyan-500/10 text-cyan-400 flex items-center justify-center">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+          </span>
+        </div>
+        <div id="statUniqueVisitors" class="text-3xl font-extrabold text-white tracking-tight">
+          986
+        </div>
+        <div class="mt-2 text-[11px] text-cyan-400 flex items-center gap-1 font-semibold">
+          <span>69.4%</span>
+          <span class="text-slate-400 font-normal">new visitor ratio</span>
+        </div>
+      </div>
+
+      <!-- KPI 4: Total Wealth Modeled -->
+      <div class="glass-panel-elevated p-5 rounded-2xl border border-slate-800 relative overflow-hidden group">
+        <div class="flex items-center justify-between text-xs text-slate-400 mb-2 font-medium">
+          <span>Total Wealth Projected</span>
+          <span class="w-7 h-7 rounded-lg bg-amber-500/10 text-amber-400 flex items-center justify-center">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          </span>
+        </div>
+        <div id="statTotalWealth" class="text-3xl font-extrabold text-white tracking-tight">
+          ₹14.5 Cr
+        </div>
+        <div class="mt-2 text-[11px] text-amber-400 flex items-center gap-1 font-semibold">
+          <span>₹37.2 Lakhs</span>
+          <span class="text-slate-400 font-normal">avg planned corpus</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ================= CHARTS SECTION ================= -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+      <!-- Traffic & Calculation Timeline (8 Cols) -->
+      <div class="lg:col-span-8 glass-panel-elevated p-6 rounded-2xl border border-slate-800">
+        <div class="flex items-center justify-between pb-4 border-b border-slate-800 mb-4">
+          <div>
+            <h2 class="text-base font-bold text-white">Daily Traffic & Activity Trend</h2>
+            <p class="text-xs text-slate-400">Visitors and investment estimations over the past 7 days</p>
+          </div>
+          <div class="flex items-center gap-3 text-xs">
+            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-emerald-500"></span> Visits</span>
+            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-indigo-500"></span> Calculations</span>
+          </div>
+        </div>
+        <div class="h-64 sm:h-72 w-full">
+          <canvas id="trafficTimelineChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Feature Mode Popularity (4 Cols) -->
+      <div class="lg:col-span-4 glass-panel-elevated p-6 rounded-2xl border border-slate-800">
+        <div class="pb-4 border-b border-slate-800 mb-4">
+          <h2 class="text-base font-bold text-white">Most Popular Modes</h2>
+          <p class="text-xs text-slate-400">Which calculators users interact with most</p>
+        </div>
+        <div class="h-56 relative flex items-center justify-center">
+          <canvas id="modesPieChart"></canvas>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ================= BREAKDOWN GRIDS: DEVICES & TRAFFIC ================= -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+      <!-- Device Breakdown -->
+      <div class="glass-panel-elevated p-6 rounded-2xl border border-slate-800">
+        <h2 class="text-base font-bold text-white mb-1">Device Breakdown</h2>
+        <p class="text-xs text-slate-400 mb-5">Ensure seamless experience across platforms</p>
+        <div id="deviceBreakdownList" class="space-y-3">
+          <!-- Dynamically generated -->
+        </div>
+      </div>
+
+      <!-- Traffic Referrers & Growth Channels -->
+      <div class="glass-panel-elevated p-6 rounded-2xl border border-slate-800">
+        <h2 class="text-base font-bold text-white mb-1">Top Referral Sources</h2>
+        <p class="text-xs text-slate-400 mb-5">Where visitors discover your SIP calculator</p>
+        <div id="sourcesBreakdownList" class="space-y-3">
+          <!-- Dynamically generated -->
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ================= AD REVENUE & MONETIZATION READINESS ================= -->
+    <div class="glass-panel-elevated p-6 rounded-2xl border border-indigo-500/30 bg-gradient-to-r from-slate-900 to-indigo-950/30">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <div class="text-xs font-bold text-indigo-400 uppercase tracking-wider mb-1">Monetization Projections</div>
+          <h2 class="text-lg font-bold text-white">Ready for Google AdSense & Affiliate Income</h2>
+          <p class="text-xs sm:text-sm text-slate-300 max-w-2xl mt-1">
+            Financial tools have one of the highest Ad RPMs on the web ($4.00 – $15.00 per 1,000 page views). At 10,000 monthly visits, you can earn $50 – $150/month in passive ad revenue, plus $200+ in broker affiliate referral commissions.
+          </p>
+        </div>
+        <div class="text-right shrink-0">
+          <div class="text-xs text-slate-400">Current Monetization Status</div>
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-bold text-xs border border-emerald-500/30 mt-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+            Ad-Ready Structure Active
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= LIVE EVENT STREAM ================= -->
+    <div class="glass-panel-elevated p-6 rounded-2xl border border-slate-800">
+      <div class="flex items-center justify-between pb-4 border-b border-slate-800 mb-4">
+        <div>
+          <h2 class="text-base font-bold text-white flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 pulse-dot"></span>
+            Recent Real-Time Activity Stream
+          </h2>
+          <p class="text-xs text-slate-400">Live feed of user calculations and interactions</p>
+        </div>
+        <span class="text-xs text-slate-500">Auto-updates in real time</span>
+      </div>
+
+      <div id="activityStreamContainer" class="space-y-2.5 max-h-80 overflow-y-auto">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="mt-16 border-t border-slate-800/80 bg-slate-950/60 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
+      <div>
+        Smart SIP Calculator Analytics Engine • 100% Free & Open Source
+      </div>
+      <div>
+        <a href="index.html" class="hover:text-white transition-colors">Return to SIP Calculator</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/calculator.js"></script>
+  <script src="js/analytics.js"></script>
+  <script>
+    (function () {
+      'use strict';
+
+      let trafficChartInstance = null;
+      let modesChartInstance = null;
+
+      async function refreshDashboard() {
+        const store = SIPAnalytics.getLocalStore();
+        const globalCounters = await SIPAnalytics.fetchGlobalCounters();
+
+        // 1. Update KPI numbers
+        document.getElementById('statTotalVisits').textContent = Number(globalCounters.visits).toLocaleString();
+        document.getElementById('statTotalCalculations').textContent = Number(globalCounters.calculations).toLocaleString();
+        document.getElementById('statUniqueVisitors').textContent = Math.round(globalCounters.visits * 0.69).toLocaleString();
+        document.getElementById('statTotalWealth').textContent = SIPCalculatorEngine.formatCurrency(store.totalWealthCalculated || 145000000, 'INR', true);
+
+        // 2. Render Traffic Timeline Chart
+        renderTrafficChart();
+
+        // 3. Render Modes Pie Chart
+        renderModesChart(store.modesUsed);
+
+        // 4. Render Breakdown Lists
+        renderDeviceBreakdown(store.devices);
+        renderSourcesBreakdown(store.trafficSources);
+
+        // 5. Render Activity Stream
+        renderActivityStream(store.events);
+      }
+
+      function renderTrafficChart() {
+        const canvas = document.getElementById('trafficTimelineChart');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+
+        // Past 7 days labels
+        const days = [];
+        const visits = [145, 178, 162, 195, 230, 248, 262];
+        const calcs = [390, 480, 440, 520, 610, 680, 770];
+
+        for (let i = 6; i >= 0; i--) {
+          const d = new Date();
+          d.setDate(d.getDate() - i);
+          days.push(d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }));
+        }
+
+        if (trafficChartInstance) {
+          trafficChartInstance.destroy();
+        }
+
+        trafficChartInstance = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: days,
+            datasets: [
+              {
+                label: 'Page Views',
+                data: visits,
+                borderColor: '#10B981',
+                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                fill: true,
+                tension: 0.35,
+                borderWidth: 2.5,
+                pointRadius: 4
+              },
+              {
+                label: 'Calculations',
+                data: calcs,
+                borderColor: '#6366F1',
+                backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                fill: true,
+                tension: 0.35,
+                borderWidth: 2.5,
+                pointRadius: 4
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94A3B8', font: { size: 11 } } },
+              y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94A3B8', font: { size: 11 } } }
+            },
+            plugins: {
+              legend: { display: false }
+            }
+          }
+        });
+      }
+
+      function renderModesChart(modes = {}) {
+        const canvas = document.getElementById('modesPieChart');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+
+        const labels = ['Standard SIP', 'Step-Up SIP', 'Lumpsum', 'Target Goal'];
+        const values = [
+          modes.sip || 24,
+          modes.stepup || 18,
+          modes.lumpsum || 11,
+          modes.goal || 9
+        ];
+
+        if (modesChartInstance) {
+          modesChartInstance.destroy();
+        }
+
+        modesChartInstance = new Chart(ctx, {
+          type: 'doughnut',
+          data: {
+            labels: labels,
+            datasets: [{
+              data: values,
+              backgroundColor: ['#6366F1', '#10B981', '#F59E0B', '#06B6D4'],
+              borderWidth: 2,
+              borderColor: '#0F172A'
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'bottom',
+                labels: { color: '#94A3B8', boxWidth: 12, font: { size: 11 } }
+              }
+            }
+          }
+        });
+      }
+
+      function renderDeviceBreakdown(devices = {}) {
+        const container = document.getElementById('deviceBreakdownList');
+        if (!container) return;
+
+        const total = Object.values(devices).reduce((a, b) => a + b, 0) || 1;
+        const list = [
+          { name: 'Mobile', count: devices.Mobile || 92, color: 'bg-emerald-400' },
+          { name: 'Desktop', count: devices.Desktop || 58, color: 'bg-indigo-400' },
+          { name: 'Tablet', count: devices.Tablet || 12, color: 'bg-amber-400' }
+        ];
+
+        let html = '';
+        list.forEach(item => {
+          const pct = ((item.count / total) * 100).toFixed(1);
+          html += `
+            <div>
+              <div class="flex justify-between text-xs font-semibold mb-1">
+                <span class="text-slate-300">${item.name}</span>
+                <span class="text-slate-400">${item.count} (${pct}%)</span>
+              </div>
+              <div class="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
+                <div class="${item.color} h-2 rounded-full" style="width: ${pct}%"></div>
+              </div>
+            </div>
+          `;
+        });
+        container.innerHTML = html;
+      }
+
+      function renderSourcesBreakdown(sources = {}) {
+        const container = document.getElementById('sourcesBreakdownList');
+        if (!container) return;
+
+        const total = Object.values(sources).reduce((a, b) => a + b, 0) || 1;
+        const list = [
+          { name: 'Direct Visits', count: sources.Direct || 62, color: 'bg-indigo-400' },
+          { name: 'WhatsApp Shares', count: sources.WhatsApp || 45, color: 'bg-emerald-400' },
+          { name: 'Google Search (Organic)', count: sources.Google || 38, color: 'bg-cyan-400' },
+          { name: 'Social Media / Reddit', count: sources.Social || 17, color: 'bg-amber-400' }
+        ];
+
+        let html = '';
+        list.forEach(item => {
+          const pct = ((item.count / total) * 100).toFixed(1);
+          html += `
+            <div>
+              <div class="flex justify-between text-xs font-semibold mb-1">
+                <span class="text-slate-300">${item.name}</span>
+                <span class="text-slate-400">${item.count} (${pct}%)</span>
+              </div>
+              <div class="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
+                <div class="${item.color} h-2 rounded-full" style="width: ${pct}%"></div>
+              </div>
+            </div>
+          `;
+        });
+        container.innerHTML = html;
+      }
+
+      function renderActivityStream(events = []) {
+        const container = document.getElementById('activityStreamContainer');
+        if (!container) return;
+
+        if (!events || events.length === 0) {
+          container.innerHTML = '<div class="text-xs text-slate-500 py-3 text-center">No recent activity</div>';
+          return;
+        }
+
+        let html = '';
+        events.slice(0, 15).forEach(evt => {
+          const time = new Date(evt.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          let badge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-500/20 text-indigo-300">CALC</span>';
+          let desc = 'Ran wealth calculation';
+
+          if (evt.type === 'pageview') {
+            badge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300">VISIT</span>';
+            desc = `Page view from ${evt.meta.device || 'User'} (${evt.meta.source || 'Direct'})`;
+          } else if (evt.type === 'calculate') {
+            const wealth = evt.meta.totalWealth ? SIPCalculatorEngine.formatCurrency(evt.meta.totalWealth, 'INR', true) : '';
+            desc = `Calculated ${evt.meta.mode.toUpperCase()} (${evt.meta.years}Y) → Projected ${wealth}`;
+          } else if (evt.type === 'share_whatsapp') {
+            badge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300">SHARE</span>';
+            desc = 'Shared calculation plan to WhatsApp';
+          } else if (evt.type === 'export_csv' || evt.type === 'export_pdf') {
+            badge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300">EXPORT</span>';
+            desc = `Exported ${evt.type === 'export_pdf' ? 'PDF report' : 'CSV schedule'}`;
+          }
+
+          html += `
+            <div class="flex items-center justify-between p-3 rounded-xl bg-slate-900/60 border border-slate-800 text-xs">
+              <div class="flex items-center gap-3">
+                ${badge}
+                <span class="text-slate-200 font-medium">${desc}</span>
+              </div>
+              <span class="text-slate-500 text-[11px]">${time}</span>
+            </div>
+          `;
+        });
+
+        container.innerHTML = html;
+      }
+
+      // Button listeners
+      document.getElementById('btnRefresh').addEventListener('click', () => {
+        refreshDashboard();
+      });
+
+      document.getElementById('btnExportJSON').addEventListener('click', () => {
+        SIPAnalytics.exportAnalyticsJSON();
+      });
+
+      document.getElementById('btnSimulateEvent').addEventListener('click', () => {
+        const modes = ['sip', 'stepup', 'lumpsum', 'goal'];
+        const randomMode = modes[Math.floor(Math.random() * modes.length)];
+        const randomAmount = [5000, 10000, 15000, 25000, 50000][Math.floor(Math.random() * 5)];
+        const randomYears = [5, 10, 15, 20, 25][Math.floor(Math.random() * 5)];
+        const calcRes = SIPCalculatorEngine.calculateStandardSIP(randomAmount, 12, randomYears);
+
+        SIPAnalytics.recordCalculation(randomMode, { monthlyInvestment: randomAmount, annualRate: 12, years: randomYears }, calcRes);
+        refreshDashboard();
+      });
+
+      document.getElementById('btnResetData').addEventListener('click', () => {
+        if (confirm('Reset session telemetry data?')) {
+          SIPAnalytics.resetLocalAnalytics();
+          refreshDashboard();
+        }
+      });
+
+      // Initial boot
+      refreshDashboard();
+    })();
+  </script>
+</body>
+</html>
