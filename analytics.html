@@ -40,45 +40,74 @@
 </head>
 <body class="min-h-screen bg-[#090d16] text-slate-100 flex flex-col selection:bg-indigo-500 selection:text-white">
 
-  <!-- ================= SECURITY LOCK SCREEN (Default view if unauthenticated) ================= -->
+  <!-- ================= SECURITY LOCK SCREEN ================= -->
   <div id="authGatekeeper" class="fixed inset-0 z-50 bg-[#090d16]/95 backdrop-blur-xl flex items-center justify-center p-4">
     <div class="glass-panel-elevated max-w-md w-full p-8 rounded-3xl border border-slate-800 text-center shadow-2xl relative">
       
-      <!-- Lock Icon -->
+      <!-- Shield Lock Icon -->
       <div class="w-16 h-16 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 mx-auto flex items-center justify-center mb-5 shadow-lg shadow-indigo-500/10">
         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
         </svg>
       </div>
 
-      <h1 class="text-2xl font-extrabold text-white mb-2">Private Owner Dashboard</h1>
-      <p class="text-xs sm:text-sm text-slate-400 mb-6">
-        This page is restricted to the site owner. Please enter your admin passcode to view real live visitor telemetry.
-      </p>
+      <!-- State 1: Normal Login -->
+      <div id="loginView">
+        <h1 class="text-2xl font-extrabold text-white mb-2">Owner Security Gate</h1>
+        <p class="text-xs sm:text-sm text-slate-400 mb-6">
+          Access is restricted to the site owner. Please enter your secret master passcode.
+        </p>
 
-      <form id="authForm" class="space-y-4">
-        <div>
-          <input id="adminPinInput" type="password" maxlength="20" placeholder="Enter Admin Passcode" autocomplete="current-password" autofocus
-            class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-center text-lg tracking-widest font-mono text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
-          <div id="authErrorMsg" class="text-xs text-rose-400 mt-2 hidden font-semibold">
-            Incorrect passcode. Try again.
+        <form id="authForm" class="space-y-4">
+          <div>
+            <input id="adminPinInput" type="password" maxlength="32" placeholder="Enter Your Master Passcode" autocomplete="current-password" autofocus
+              class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-center text-lg tracking-widest font-mono text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
+            <div id="authErrorMsg" class="text-xs text-rose-400 mt-2 hidden font-semibold">
+              Incorrect passcode. Access denied.
+            </div>
           </div>
-        </div>
 
-        <button type="submit" class="w-full py-3 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm shadow-lg shadow-indigo-600/30 transition-all">
-          Unlock Dashboard
-        </button>
-      </form>
+          <button id="btnUnlock" type="submit" class="w-full py-3 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm shadow-lg shadow-indigo-600/30 transition-all">
+            Unlock Dashboard
+          </button>
+        </form>
+      </div>
+
+      <!-- State 2: First Time Setup (if pin_hash is UNSET) -->
+      <div id="setupView" class="hidden">
+        <h1 class="text-2xl font-extrabold text-emerald-400 mb-2">Owner Passcode Setup</h1>
+        <p class="text-xs sm:text-sm text-slate-300 mb-6">
+          Welcome Akash! Create your private master passcode now. It will be encrypted and saved on the cloud permanently so only you can access this page.
+        </p>
+
+        <form id="setupForm" class="space-y-4">
+          <div>
+            <input id="newPinInput" type="password" minlength="4" maxlength="32" placeholder="Choose Master Passcode (min 4 chars)" required
+              class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-center text-sm font-mono text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all">
+          </div>
+          <div>
+            <input id="confirmPinInput" type="password" minlength="4" maxlength="32" placeholder="Confirm Master Passcode" required
+              class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-center text-sm font-mono text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all">
+            <div id="setupErrorMsg" class="text-xs text-rose-400 mt-2 hidden font-semibold">
+              Passcodes do not match.
+            </div>
+          </div>
+
+          <button type="submit" class="w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm shadow-lg shadow-emerald-600/30 transition-all">
+            Save Private Master Passcode
+          </button>
+        </form>
+      </div>
 
       <div class="mt-6 pt-5 border-t border-slate-800 text-xs text-slate-500 flex items-center justify-between">
-        <span>Default PIN: <strong class="text-indigo-400">2026</strong></span>
-        <a href="index.html" class="hover:text-slate-300 transition-colors">← Back to Calculator</a>
+        <span>Cloud-Encrypted (SHA-256)</span>
+        <a href="index.html" class="hover:text-slate-300 transition-colors">← Return to Calculator</a>
       </div>
 
     </div>
   </div>
 
-  <!-- ================= AUTHENTICATED DASHBOARD (Hidden until passcode unlocked) ================= -->
+  <!-- ================= AUTHENTICATED DASHBOARD ================= -->
   <div id="dashboardContent" class="hidden flex-col flex-grow">
 
     <!-- Top Navigation Header -->
@@ -94,7 +123,7 @@
           <div class="flex items-center gap-2">
             <div class="w-2.5 h-2.5 rounded-full bg-emerald-400 pulse-dot"></div>
             <span class="text-sm font-bold text-white tracking-tight">Akash's Private Analytics</span>
-            <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">100% REAL LIVE DATA</span>
+            <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">CLOUD PERSISTENT</span>
           </div>
         </div>
 
@@ -103,9 +132,9 @@
             <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
             <span class="hidden sm:inline">Refresh</span>
           </button>
-          <button id="btnExportJSON" class="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-colors">
-            <svg class="w-3.5 h-3.5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-            <span class="hidden sm:inline">Export</span>
+          <button id="btnChangePin" class="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-colors">
+            <svg class="w-3.5 h-3.5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
+            <span>Change Passcode</span>
           </button>
           <button id="btnLockDashboard" class="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg bg-rose-950/40 hover:bg-rose-900/60 text-rose-300 border border-rose-500/40 transition-colors">
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
@@ -123,27 +152,24 @@
       <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-800">
         <div>
           <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight flex items-center gap-3">
-            Real-Time Traffic & Usage Telemetry
+            Real-Time Cloud Telemetry
           </h1>
           <p class="text-xs sm:text-sm text-slate-400 mt-1">
-            Tracking genuine visitor hits and calculation events with zero mock data.
+            Data persists safely in the cloud across all devices. Clearing browser cache never resets these counters.
           </p>
         </div>
 
-        <div class="flex items-center gap-3">
-          <button id="btnChangePin" class="px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-xs font-semibold text-slate-300 hover:text-white transition-colors">
-            Change Passcode
-          </button>
-          <button id="btnResetData" class="px-3 py-1.5 rounded-lg bg-slate-900 border border-rose-500/40 text-xs font-semibold text-rose-400 hover:bg-rose-950/40 transition-colors" title="Wipe local browser cache and reload fresh from server">
-            Clear Browser Cache
+        <div>
+          <button id="btnClearLocal" class="px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-700 hover:border-slate-600 text-xs font-semibold text-slate-300 transition-colors" title="Clears browser session events without affecting cloud totals">
+            Reset Browser Session Cache
           </button>
         </div>
       </div>
 
-      <!-- 4 REAL KPI CARDS -->
+      <!-- 4 CLOUD-PERSISTENT KPI CARDS -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         
-        <!-- KPI 1: Real Global Visits -->
+        <!-- KPI 1: Real Cloud Visits -->
         <div class="glass-panel-elevated p-5 rounded-2xl border border-slate-800 relative overflow-hidden">
           <div class="flex items-center justify-between text-xs text-slate-400 mb-2 font-medium">
             <span>Genuine Page Visits</span>
@@ -155,12 +181,12 @@
             0
           </div>
           <div class="mt-2 text-[11px] text-emerald-400 flex items-center gap-1 font-semibold">
-            <span>Live Server Tracker</span>
-            <span class="text-slate-400 font-normal">(hits.sh verified)</span>
+            <span>Cloud Persistent</span>
+            <span class="text-slate-400 font-normal">(Never resets)</span>
           </div>
         </div>
 
-        <!-- KPI 2: Real Total Calculations -->
+        <!-- KPI 2: Real Cloud Calculations -->
         <div class="glass-panel-elevated p-5 rounded-2xl border border-slate-800 relative overflow-hidden">
           <div class="flex items-center justify-between text-xs text-slate-400 mb-2 font-medium">
             <span>Calculations Performed</span>
@@ -172,30 +198,14 @@
             0
           </div>
           <div class="mt-2 text-[11px] text-indigo-400 flex items-center gap-1 font-semibold">
-            <span>Real-time usage count</span>
+            <span>Total user calculations</span>
           </div>
         </div>
 
-        <!-- KPI 3: Unique Visitors -->
+        <!-- KPI 3: Total Wealth Modeled -->
         <div class="glass-panel-elevated p-5 rounded-2xl border border-slate-800 relative overflow-hidden">
           <div class="flex items-center justify-between text-xs text-slate-400 mb-2 font-medium">
-            <span>Unique Devices</span>
-            <span class="w-7 h-7 rounded-lg bg-cyan-500/10 text-cyan-400 flex items-center justify-center">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-            </span>
-          </div>
-          <div id="statUniqueVisitors" class="text-3xl font-extrabold text-white tracking-tight">
-            0
-          </div>
-          <div class="mt-2 text-[11px] text-cyan-400 flex items-center gap-1 font-semibold">
-            <span>Fingerprinted devices</span>
-          </div>
-        </div>
-
-        <!-- KPI 4: Total Wealth Modeled -->
-        <div class="glass-panel-elevated p-5 rounded-2xl border border-slate-800 relative overflow-hidden">
-          <div class="flex items-center justify-between text-xs text-slate-400 mb-2 font-medium">
-            <span>Total Wealth Modeled</span>
+            <span>Total Wealth Projected</span>
             <span class="w-7 h-7 rounded-lg bg-amber-500/10 text-amber-400 flex items-center justify-center">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
             </span>
@@ -204,7 +214,23 @@
             ₹0
           </div>
           <div class="mt-2 text-[11px] text-amber-400 flex items-center gap-1 font-semibold">
-            <span>Cumulative portfolio sums</span>
+            <span>Cumulative corpus</span>
+          </div>
+        </div>
+
+        <!-- KPI 4: Security Status -->
+        <div class="glass-panel-elevated p-5 rounded-2xl border border-slate-800 relative overflow-hidden">
+          <div class="flex items-center justify-between text-xs text-slate-400 mb-2 font-medium">
+            <span>Security Status</span>
+            <span class="w-7 h-7 rounded-lg bg-cyan-500/10 text-cyan-400 flex items-center justify-center">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+            </span>
+          </div>
+          <div class="text-2xl font-extrabold text-emerald-400 tracking-tight">
+            Protected
+          </div>
+          <div class="mt-2 text-[11px] text-cyan-400 flex items-center gap-1 font-semibold">
+            <span>Cloud SHA-256 Auth</span>
           </div>
         </div>
 
@@ -217,8 +243,8 @@
         <div class="lg:col-span-8 glass-panel-elevated p-6 rounded-2xl border border-slate-800">
           <div class="flex items-center justify-between pb-4 border-b border-slate-800 mb-4">
             <div>
-              <h2 class="text-base font-bold text-white">Genuine Traffic & Calculation Metrics</h2>
-              <p class="text-xs text-slate-400">Real verified numbers recorded since deployment</p>
+              <h2 class="text-base font-bold text-white">Cloud Traffic & Calculation Summary</h2>
+              <p class="text-xs text-slate-400">Authentic metrics synced from global cloud</p>
             </div>
             <div class="flex items-center gap-3 text-xs">
               <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-emerald-500"></span> Visits</span>
@@ -233,8 +259,8 @@
         <!-- Mode Popularity (4 cols) -->
         <div class="lg:col-span-4 glass-panel-elevated p-6 rounded-2xl border border-slate-800">
           <div class="pb-4 border-b border-slate-800 mb-4">
-            <h2 class="text-base font-bold text-white">Popular Modes Used</h2>
-            <p class="text-xs text-slate-400">Actual user preferences</p>
+            <h2 class="text-base font-bold text-white">Popular Modes</h2>
+            <p class="text-xs text-slate-400">Features users interact with</p>
           </div>
           <div class="h-56 relative flex items-center justify-center">
             <canvas id="modesPieChart"></canvas>
@@ -247,29 +273,15 @@
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div class="glass-panel-elevated p-6 rounded-2xl border border-slate-800">
           <h2 class="text-base font-bold text-white mb-1">Device Breakdown</h2>
-          <p class="text-xs text-slate-400 mb-5">Visitor device distribution</p>
+          <p class="text-xs text-slate-400 mb-5">Visitor platforms</p>
           <div id="deviceBreakdownList" class="space-y-3"></div>
         </div>
 
         <div class="glass-panel-elevated p-6 rounded-2xl border border-slate-800">
           <h2 class="text-base font-bold text-white mb-1">Traffic Channels</h2>
-          <p class="text-xs text-slate-400 mb-5">Where your visitors arrive from</p>
+          <p class="text-xs text-slate-400 mb-5">Referral origins</p>
           <div id="sourcesBreakdownList" class="space-y-3"></div>
         </div>
-      </div>
-
-      <!-- REAL ACTIVITY LOG -->
-      <div class="glass-panel-elevated p-6 rounded-2xl border border-slate-800">
-        <div class="flex items-center justify-between pb-4 border-b border-slate-800 mb-4">
-          <div>
-            <h2 class="text-base font-bold text-white flex items-center gap-2">
-              <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 pulse-dot"></span>
-              Real User Activity Stream
-            </h2>
-            <p class="text-xs text-slate-400">Live events generated by actual visitors</p>
-          </div>
-        </div>
-        <div id="activityStreamContainer" class="space-y-2.5 max-h-80 overflow-y-auto"></div>
       </div>
 
     </main>
@@ -277,7 +289,7 @@
     <!-- Footer -->
     <footer class="mt-16 border-t border-slate-800/80 bg-slate-950/60 py-6">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-xs text-slate-500">
-        Smart SIP Calculator Private Analytics Engine • Protected Owner Access
+        Smart SIP Calculator Private Telemetry • Secured for Akash
       </div>
     </footer>
 
@@ -290,92 +302,159 @@
     (function () {
       'use strict';
 
-      const PIN_STORAGE_KEY = 'sip_admin_pin_code';
-      const AUTH_SESSION_KEY = 'sip_admin_authenticated';
-
-      // Elements
       const authGatekeeper = document.getElementById('authGatekeeper');
+      const loginView = document.getElementById('loginView');
+      const setupView = document.getElementById('setupView');
       const dashboardContent = document.getElementById('dashboardContent');
+
       const authForm = document.getElementById('authForm');
       const adminPinInput = document.getElementById('adminPinInput');
       const authErrorMsg = document.getElementById('authErrorMsg');
+
+      const setupForm = document.getElementById('setupForm');
+      const newPinInput = document.getElementById('newPinInput');
+      const confirmPinInput = document.getElementById('confirmPinInput');
+      const setupErrorMsg = document.getElementById('setupErrorMsg');
+
       const btnLockDashboard = document.getElementById('btnLockDashboard');
       const btnChangePin = document.getElementById('btnChangePin');
+      const btnRefresh = document.getElementById('btnRefresh');
+      const btnClearLocal = document.getElementById('btnClearLocal');
 
       let trafficChartInstance = null;
       let modesChartInstance = null;
 
-      function getStoredPin() {
-        return localStorage.getItem(PIN_STORAGE_KEY) || '2026';
-      }
+      async function checkInitialState() {
+        if (SIPAnalytics.isSessionAuthenticated()) {
+          unlockDashboard();
+          return;
+        }
 
-      function checkAuth() {
-        if (sessionStorage.getItem(AUTH_SESSION_KEY) === 'true') {
-          authGatekeeper.classList.add('hidden');
-          dashboardContent.classList.remove('hidden');
-          refreshDashboard();
+        // Check if cloud pin is unset
+        const cloud = await SIPAnalytics.fetchCloudData();
+        if (!cloud.pin_hash || cloud.pin_hash === 'UNSET') {
+          loginView.classList.add('hidden');
+          setupView.classList.remove('hidden');
         } else {
-          authGatekeeper.classList.remove('hidden');
-          dashboardContent.classList.add('hidden');
-          adminPinInput.value = '';
+          loginView.classList.remove('hidden');
+          setupView.classList.add('hidden');
           adminPinInput.focus();
         }
       }
 
-      authForm.addEventListener('submit', function (e) {
+      function unlockDashboard() {
+        authGatekeeper.classList.add('hidden');
+        dashboardContent.classList.remove('hidden');
+        refreshDashboard();
+      }
+
+      // Handle Login
+      authForm.addEventListener('submit', async function (e) {
         e.preventDefault();
-        const input = (adminPinInput.value || '').trim();
-        const currentPin = getStoredPin();
+        const pin = (adminPinInput.value || '').trim();
+        if (!pin) return;
 
-        if (input === currentPin) {
-          authErrorMsg.classList.add('hidden');
-          sessionStorage.setItem(AUTH_SESSION_KEY, 'true');
-          checkAuth();
-        } else {
-          authErrorMsg.classList.remove('hidden');
-          adminPinInput.classList.add('border-rose-500');
-          setTimeout(() => adminPinInput.classList.remove('border-rose-500'), 1500);
-        }
-      });
+        const btn = document.getElementById('btnUnlock');
+        btn.textContent = 'Verifying...';
+        btn.disabled = true;
 
-      btnLockDashboard.addEventListener('click', function () {
-        sessionStorage.removeItem(AUTH_SESSION_KEY);
-        checkAuth();
-      });
-
-      btnChangePin.addEventListener('click', function () {
-        const current = prompt('Enter your current passcode:');
-        if (current === getStoredPin()) {
-          const newPin = prompt('Enter your new passcode (e.g. 4-8 characters):');
-          if (newPin && newPin.trim().length >= 3) {
-            localStorage.setItem(PIN_STORAGE_KEY, newPin.trim());
-            alert('Passcode updated successfully! Remember your new passcode.');
+        try {
+          const res = await SIPAnalytics.verifyPasscode(pin);
+          if (res.status === 'SUCCESS') {
+            authErrorMsg.classList.add('hidden');
+            unlockDashboard();
           } else {
-            alert('Invalid passcode. Must be at least 3 characters.');
+            authErrorMsg.classList.remove('hidden');
+            adminPinInput.classList.add('border-rose-500');
+            setTimeout(() => adminPinInput.classList.remove('border-rose-500'), 1500);
           }
-        } else if (current !== null) {
-          alert('Incorrect current passcode.');
+        } catch (err) {
+          alert('Network verification error. Please retry.');
+        } finally {
+          btn.textContent = 'Unlock Dashboard';
+          btn.disabled = false;
         }
+      });
+
+      // Handle Setup
+      setupForm.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        const p1 = (newPinInput.value || '').trim();
+        const p2 = (confirmPinInput.value || '').trim();
+
+        if (p1 !== p2) {
+          setupErrorMsg.textContent = 'Passcodes do not match.';
+          setupErrorMsg.classList.remove('hidden');
+          return;
+        }
+        if (p1.length < 4) {
+          setupErrorMsg.textContent = 'Passcode must be at least 4 characters.';
+          setupErrorMsg.classList.remove('hidden');
+          return;
+        }
+
+        setupErrorMsg.classList.add('hidden');
+        try {
+          await SIPAnalytics.setupMasterPasscode(p1);
+          alert('Master passcode established and saved to the cloud! Only you know this passcode.');
+          unlockDashboard();
+        } catch (err) {
+          alert('Error saving passcode to cloud: ' + err.message);
+        }
+      });
+
+      // Handle Lock
+      btnLockDashboard.addEventListener('click', function () {
+        SIPAnalytics.logout();
+        authGatekeeper.classList.remove('hidden');
+        dashboardContent.classList.add('hidden');
+        adminPinInput.value = '';
+        checkInitialState();
+      });
+
+      // Handle Change PIN
+      btnChangePin.addEventListener('click', async function () {
+        const current = prompt('Enter your current master passcode:');
+        if (!current) return;
+
+        const newP = prompt('Enter your new master passcode (min 4 characters):');
+        if (!newP || newP.trim().length < 4) {
+          alert('New passcode must be at least 4 characters.');
+          return;
+        }
+
+        try {
+          await SIPAnalytics.changeMasterPasscode(current, newP);
+          alert('Master passcode successfully updated on the cloud across all devices!');
+        } catch (err) {
+          alert('Failed to change passcode: ' + err.message);
+        }
+      });
+
+      // Handle Refresh & Clear Local
+      btnRefresh.addEventListener('click', refreshDashboard);
+      btnClearLocal.addEventListener('click', function () {
+        SIPAnalytics.resetLocalCacheOnly();
+        refreshDashboard();
+        alert('Browser session cache cleared. Cloud metrics reloaded.');
       });
 
       async function refreshDashboard() {
-        const store = SIPAnalytics.getLocalStore();
-        const globalCounters = await SIPAnalytics.fetchGlobalCounters();
+        const cloud = await SIPAnalytics.fetchCloudData();
+        const local = SIPAnalytics.getLocalStore();
 
-        const realVisits = Math.max(globalCounters.visits || 0, store.localVisits || 0);
-        const realCalcs = Math.max(globalCounters.calculations || 0, store.totalCalculations || 0);
-        const uniqueDevices = store.localVisits > 0 ? 1 : (realVisits > 0 ? realVisits : 0);
+        const realVisits = cloud.visits || 0;
+        const realCalcs = cloud.calcs || 0;
+        const realWealth = cloud.wealth || 0;
 
-        document.getElementById('statTotalVisits').textContent = realVisits.toLocaleString();
-        document.getElementById('statTotalCalculations').textContent = realCalcs.toLocaleString();
-        document.getElementById('statUniqueVisitors').textContent = uniqueDevices.toLocaleString();
-        document.getElementById('statTotalWealth').textContent = SIPCalculatorEngine.formatCurrency(store.totalWealthCalculated || 0, 'INR', true);
+        document.getElementById('statTotalVisits').textContent = Number(realVisits).toLocaleString();
+        document.getElementById('statTotalCalculations').textContent = Number(realCalcs).toLocaleString();
+        document.getElementById('statTotalWealth').textContent = SIPCalculatorEngine.formatCurrency(realWealth, 'INR', true);
 
         renderTrafficChart(realVisits, realCalcs);
-        renderModesChart(store.modesUsed);
-        renderDeviceBreakdown(store.devices);
-        renderSourcesBreakdown(store.trafficSources);
-        renderActivityStream(store.events);
+        renderModesChart(local.modesUsed);
+        renderDeviceBreakdown(local.devices);
+        renderSourcesBreakdown(local.trafficSources);
       }
 
       function renderTrafficChart(totalVisits, totalCalcs) {
@@ -383,16 +462,14 @@
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
 
-        if (trafficChartInstance) {
-          trafficChartInstance.destroy();
-        }
+        if (trafficChartInstance) trafficChartInstance.destroy();
 
         trafficChartInstance = new Chart(ctx, {
           type: 'bar',
           data: {
             labels: ['Total Live Visits', 'Calculations Executed'],
             datasets: [{
-              label: 'Real Activity Count',
+              label: 'Cloud Count',
               data: [totalVisits, totalCalcs],
               backgroundColor: ['#10B981', '#6366F1'],
               borderRadius: 8,
@@ -407,9 +484,7 @@
               x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94A3B8' } },
               y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94A3B8', stepSize: 1 } }
             },
-            plugins: {
-              legend: { display: false }
-            }
+            plugins: { legend: { display: false } }
           }
         });
       }
@@ -423,11 +498,9 @@
         const labels = ['Standard SIP', 'Step-Up SIP', 'Lumpsum', 'Target Goal'];
         const values = totalUsed > 0 
           ? [modes.sip || 0, modes.stepup || 0, modes.lumpsum || 0, modes.goal || 0]
-          : [1, 0, 0, 0]; // Default placeholder if 0
+          : [1, 0, 0, 0];
 
-        if (modesChartInstance) {
-          modesChartInstance.destroy();
-        }
+        if (modesChartInstance) modesChartInstance.destroy();
 
         modesChartInstance = new Chart(ctx, {
           type: 'doughnut',
@@ -444,10 +517,7 @@
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-              legend: {
-                position: 'bottom',
-                labels: { color: '#94A3B8', boxWidth: 12, font: { size: 11 } }
-              }
+              legend: { position: 'bottom', labels: { color: '#94A3B8', boxWidth: 12, font: { size: 11 } } }
             }
           }
         });
@@ -512,61 +582,7 @@
         container.innerHTML = html;
       }
 
-      function renderActivityStream(events = []) {
-        const container = document.getElementById('activityStreamContainer');
-        if (!container) return;
-
-        if (!events || events.length === 0) {
-          container.innerHTML = '<div class="text-xs text-slate-500 py-6 text-center">No calculations yet. When users calculate, live events will appear here.</div>';
-          return;
-        }
-
-        let html = '';
-        events.slice(0, 15).forEach(evt => {
-          const time = new Date(evt.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-          let badge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-500/20 text-indigo-300">CALC</span>';
-          let desc = 'Ran wealth calculation';
-
-          if (evt.type === 'pageview') {
-            badge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300">VISIT</span>';
-            desc = `Page view from ${evt.meta.device || 'User'} (${evt.meta.source || 'Direct'})`;
-          } else if (evt.type === 'calculate') {
-            const wealth = evt.meta.totalWealth ? SIPCalculatorEngine.formatCurrency(evt.meta.totalWealth, 'INR', true) : '';
-            desc = `Calculated ${evt.meta.mode.toUpperCase()} (${evt.meta.years}Y) → Projected ${wealth}`;
-          } else if (evt.type === 'share_whatsapp') {
-            badge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300">SHARE</span>';
-            desc = 'Shared calculation plan to WhatsApp';
-          } else if (evt.type === 'export_csv' || evt.type === 'export_pdf') {
-            badge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300">EXPORT</span>';
-            desc = `Exported ${evt.type === 'export_pdf' ? 'PDF report' : 'CSV schedule'}`;
-          }
-
-          html += `
-            <div class="flex items-center justify-between p-3 rounded-xl bg-slate-900/60 border border-slate-800 text-xs">
-              <div class="flex items-center gap-3">
-                ${badge}
-                <span class="text-slate-200 font-medium">${desc}</span>
-              </div>
-              <span class="text-slate-500 text-[11px]">${time}</span>
-            </div>
-          `;
-        });
-
-        container.innerHTML = html;
-      }
-
-      // Event Listeners
-      document.getElementById('btnRefresh').addEventListener('click', refreshDashboard);
-      document.getElementById('btnExportJSON').addEventListener('click', () => SIPAnalytics.exportAnalyticsJSON());
-      document.getElementById('btnResetData').addEventListener('click', () => {
-        if (confirm('Clear local browser cache and reload fresh from the live server?')) {
-          SIPAnalytics.resetLocalAnalytics();
-          refreshDashboard();
-        }
-      });
-
-      // Boot check
-      checkAuth();
+      checkInitialState();
     })();
   </script>
 </body>

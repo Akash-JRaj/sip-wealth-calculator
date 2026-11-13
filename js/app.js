@@ -94,6 +94,101 @@
   }
 
   /**
+   * Mathematically exact slider tick positioning & click snapping
+   */
+  function renderSliderTicks(slider, containerId, ticks) {
+    const container = document.getElementById(containerId);
+    if (!slider || !container) return;
+
+    const min = Number(slider.min);
+    const max = Number(slider.max);
+    container.innerHTML = '';
+
+    ticks.forEach(tick => {
+      const val = tick.val;
+      const label = tick.label;
+      const pct = Math.max(0, Math.min(100, ((val - min) / (max - min)) * 100));
+
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.textContent = label;
+      // Position mathematically aligned with 22px thumb:
+      btn.style.left = `calc(${pct}% * (1 - 22px / 100%) + 11px)`;
+      btn.className = 'absolute -translate-x-1/2 top-0.5 hover:text-indigo-300 cursor-pointer font-medium transition-colors text-[10px] sm:text-[11px] whitespace-nowrap';
+      if (tick.highlight) {
+        btn.className += ' text-emerald-400 font-bold';
+      }
+
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        slider.value = val;
+        slider.dispatchEvent(new Event('input'));
+      });
+
+      container.appendChild(btn);
+    });
+  }
+
+  function updateSliderFill(slider) {
+    if (!slider) return;
+    const min = Number(slider.min) || 0;
+    const max = Number(slider.max) || 100;
+    const val = Number(slider.value) || min;
+    const pct = Math.max(0, Math.min(100, ((val - min) / (max - min)) * 100));
+    slider.style.background = `linear-gradient(to right, #6366f1 0%, #6366f1 ${pct}%, #1e293b ${pct}%, #1e293b 100%)`;
+  }
+
+  function setupAllTicks() {
+    renderSliderTicks(dom.monthlySlider, 'monthlyTicks', [
+      { val: 500, label: '₹500' },
+      { val: 25000, label: '₹25k' },
+      { val: 50000, label: '₹50k' },
+      { val: 75000, label: '₹75k' },
+      { val: 100000, label: '₹1 Lakh' }
+    ]);
+
+    renderSliderTicks(dom.rateSlider, 'rateTicks', [
+      { val: 1, label: '1%' },
+      { val: 7, label: 'FD: 7%' },
+      { val: 12, label: 'Nifty: 12%', highlight: true },
+      { val: 15, label: 'Midcap: 15%' },
+      { val: 30, label: '30%' }
+    ]);
+
+    renderSliderTicks(dom.yearsSlider, 'yearsTicks', [
+      { val: 1, label: '1 Yr' },
+      { val: 5, label: '5 Y' },
+      { val: 10, label: '10 Y' },
+      { val: 15, label: '15 Y', highlight: true },
+      { val: 25, label: '25 Y' },
+      { val: 35, label: '35 Y' }
+    ]);
+
+    renderSliderTicks(dom.stepUpSlider, 'stepUpTicks', [
+      { val: 1, label: '1%' },
+      { val: 10, label: '10% (Rec)', highlight: true },
+      { val: 25, label: '25%' },
+      { val: 50, label: '50%' }
+    ]);
+
+    renderSliderTicks(dom.lumpsumSlider, 'lumpsumTicks', [
+      { val: 5000, label: '₹5k' },
+      { val: 500000, label: '₹5 Lakhs' },
+      { val: 1000000, label: '₹10 Lakhs' },
+      { val: 1800000, label: '₹18 Lakhs' },
+      { val: 2500000, label: '₹25 Lakhs' }
+    ]);
+
+    renderSliderTicks(dom.goalSlider, 'goalTicks', [
+      { val: 100000, label: '₹1L' },
+      { val: 5000000, label: '₹50L' },
+      { val: 10000000, label: '₹1 Crore', highlight: true },
+      { val: 25000000, label: '₹2.5 Cr' },
+      { val: 50000000, label: '₹5 Crore' }
+    ]);
+  }
+
+  /**
    * Sync sliders and numeric inputs
    */
   function bindSliderInput(slider, input, key, min, max, step) {
@@ -103,6 +198,7 @@
       const val = Number(slider.value);
       input.value = val;
       state[key] = val;
+      updateSliderFill(slider);
       triggerRecalculate();
     });
 
@@ -112,8 +208,11 @@
       if (val < min) val = min;
       slider.value = val;
       state[key] = val;
+      updateSliderFill(slider);
       triggerRecalculate();
     });
+
+    updateSliderFill(slider);
   }
 
   /**
@@ -576,6 +675,7 @@
     initDOM();
     loadStateFromHash();
     setupEvents();
+    setupAllTicks();
     switchMode(state.mode);
     calculateAndRender();
     initCounters();

@@ -124,39 +124,20 @@
     </div>
   </header>
 
-  <!-- ================= HERO SECTION ================= -->
-  <section class="relative pt-8 pb-4 text-center max-w-4xl mx-auto px-4 sm:px-6">
-    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold mb-3">
-      <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+  <!-- ================= HERO SECTION (CLEAN & FOCUSED) ================= -->
+  <section class="relative pt-6 pb-2 text-center max-w-4xl mx-auto px-4 sm:px-6">
+    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold mb-2">
+      <svg class="w-3.5 h-3.5 text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
         <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"></path>
       </svg>
-      The Most Powerful Wealth & Step-Up Planner Online
+      Intelligent Wealth & Compounding Planner
     </div>
-    <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight text-white mb-3">
-      Build Unstoppable Wealth with <span class="bg-gradient-to-r from-indigo-400 via-emerald-300 to-teal-400 bg-clip-text text-transparent">Smart Compounding</span>
+    <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white mb-2">
+      SIP Wealth & <span class="bg-gradient-to-r from-indigo-400 via-emerald-300 to-teal-400 bg-clip-text text-transparent">Step-Up Calculator</span>
     </h1>
-    <p class="text-sm sm:text-base text-slate-400 max-w-2xl mx-auto">
-      Calculate realistic returns with annual step-up compounding, inflation adjustments, and visual roadmaps. Free forever, running 24/7.
+    <p class="text-xs sm:text-sm text-slate-400 max-w-xl mx-auto">
+      Calculate realistic returns with annual step-up compounding, inflation adjustments, and milestone roadmaps.
     </p>
-
-    <!-- Top Leaderboard Ad Slot / Partner Banner -->
-    <div class="ad-slot-container max-w-3xl mt-6">
-      <span class="ad-label">Sponsored Partner</span>
-      <div id="topAdSlot" class="w-full flex items-center justify-between p-3 rounded-lg bg-slate-900/80 border border-slate-800">
-        <div class="flex items-center gap-3 text-left">
-          <div class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xs">
-            0%
-          </div>
-          <div>
-            <div class="text-xs font-semibold text-white">Invest in Direct Mutual Funds with Zero Brokerage</div>
-            <div class="text-[11px] text-slate-400">Save up to 1.5% extra every year in direct plans vs regular mutual funds</div>
-          </div>
-        </div>
-        <a href="https://zerodha.com" target="_blank" rel="noopener" class="px-3 py-1.5 rounded-md bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-bold transition-colors whitespace-nowrap">
-          Open Account
-        </a>
-      </div>
-    </div>
   </section>
 
   <!-- ================= CALCULATOR TABS & MAIN WORKSPACE ================= -->
@@ -219,17 +200,12 @@
                 <span class="text-xs text-slate-500">(Installment)</span>
               </label>
               <div class="relative w-36 sm:w-44">
-                <input id="monthlyInput" type="number" min="500" max="500000" step="500" value="15000"
+                <input id="monthlyInput" type="number" min="500" max="100000" step="500" value="15000"
                   class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-right font-bold text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
               </div>
             </div>
             <input id="monthlySlider" type="range" min="500" max="100000" step="500" value="15000">
-            <div class="flex justify-between text-[11px] text-slate-500">
-              <span>Min: ₹500</span>
-              <span>₹25k</span>
-              <span>₹50k</span>
-              <span>Max: ₹1,00,000</span>
-            </div>
+            <div id="monthlyTicks" class="relative w-full h-5 text-[11px] text-slate-500 select-none"></div>
           </div>
 
           <!-- INPUT: Step-Up Percentage (Visible in Step-Up Mode) -->
@@ -245,12 +221,7 @@
               </div>
             </div>
             <input id="stepUpSlider" type="range" min="1" max="50" step="1" value="10">
-            <div class="flex justify-between text-[11px] text-slate-500">
-              <span>1%</span>
-              <span class="text-emerald-400 font-semibold">10% Recommended</span>
-              <span>25%</span>
-              <span>50%</span>
-            </div>
+            <div id="stepUpTicks" class="relative w-full h-5 text-[11px] text-slate-500 select-none"></div>
           </div>
 
           <!-- INPUT: Lumpsum Principal (Visible in Lumpsum Mode) -->
@@ -260,17 +231,12 @@
                 Total Lumpsum Investment
               </label>
               <div class="relative w-40">
-                <input id="lumpsumInput" type="number" min="5000" max="10000000" step="5000" value="100000"
+                <input id="lumpsumInput" type="number" min="5000" max="2500000" step="5000" value="100000"
                   class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-right font-bold text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
               </div>
             </div>
             <input id="lumpsumSlider" type="range" min="5000" max="2500000" step="5000" value="100000">
-            <div class="flex justify-between text-[11px] text-slate-500">
-              <span>₹5k</span>
-              <span>₹5 Lakhs</span>
-              <span>₹15 Lakhs</span>
-              <span>₹25 Lakhs</span>
-            </div>
+            <div id="lumpsumTicks" class="relative w-full h-5 text-[11px] text-slate-500 select-none"></div>
           </div>
 
           <!-- INPUT: Target Goal (Visible in Goal Mode) -->
@@ -280,17 +246,12 @@
                 Target Wealth Goal
               </label>
               <div class="relative w-40">
-                <input id="goalInput" type="number" min="100000" max="100000000" step="50000" value="10000000"
+                <input id="goalInput" type="number" min="100000" max="50000000" step="100000" value="10000000"
                   class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-right font-bold text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
               </div>
             </div>
             <input id="goalSlider" type="range" min="100000" max="50000000" step="100000" value="10000000">
-            <div class="flex justify-between text-[11px] text-slate-500">
-              <span>₹1 Lakh</span>
-              <span>₹50 Lakhs</span>
-              <span class="text-emerald-400 font-semibold">₹1 Crore</span>
-              <span>₹5 Crore</span>
-            </div>
+            <div id="goalTicks" class="relative w-full h-5 text-[11px] text-slate-500 select-none"></div>
           </div>
 
           <!-- INPUT 2: Expected Return Rate (%) -->
@@ -303,18 +264,12 @@
                 <span class="text-[11px] text-slate-400">Equity Funds historical average: 12% - 15%</span>
               </div>
               <div class="relative w-28">
-                <input id="rateInput" type="number" min="1" max="35" step="0.5" value="12"
+                <input id="rateInput" type="number" min="1" max="30" step="0.5" value="12"
                   class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-right font-bold text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
               </div>
             </div>
             <input id="rateSlider" type="range" min="1" max="30" step="0.5" value="12">
-            <div class="flex justify-between text-[11px] text-slate-500">
-              <span>1%</span>
-              <span class="text-blue-400">FD (7%)</span>
-              <span class="text-emerald-400 font-semibold">Nifty 50 (12%)</span>
-              <span class="text-amber-400">Midcap (15%)</span>
-              <span>30%</span>
-            </div>
+            <div id="rateTicks" class="relative w-full h-5 text-[11px] text-slate-500 select-none"></div>
           </div>
 
           <!-- INPUT 3: Investment Duration (Years) -->
@@ -327,18 +282,12 @@
                 <span class="text-[11px] text-slate-400">Longer horizon exponentially supercharges compounding</span>
               </div>
               <div class="relative w-28">
-                <input id="yearsInput" type="number" min="1" max="40" step="1" value="15"
+                <input id="yearsInput" type="number" min="1" max="35" step="1" value="15"
                   class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-right font-bold text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
               </div>
             </div>
             <input id="yearsSlider" type="range" min="1" max="35" step="1" value="15">
-            <div class="flex justify-between text-[11px] text-slate-500">
-              <span>1 Yr</span>
-              <span>5 Yrs</span>
-              <span class="text-indigo-400 font-semibold">15 Yrs</span>
-              <span>25 Yrs</span>
-              <span>35 Yrs</span>
-            </div>
+            <div id="yearsTicks" class="relative w-full h-5 text-[11px] text-slate-500 select-none"></div>
           </div>
 
           <!-- Inflation Adjustment Toggle -->
