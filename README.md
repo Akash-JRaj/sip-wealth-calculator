@@ -1,6 +1,6 @@
 # Smart SIP Wealth & Step-Up Calculator
 
-A modern, high-performance Systematic Investment Plan (SIP) calculator and financial planning platform built for maximum user engagement, multi-year compounding insights, and monetization readiness.
+A modern, high-performance Systematic Investment Plan (SIP) calculator and financial planning platform built for maximum user engagement, multi-year compounding insights, and multi-currency wealth planning.
 
 ---
 
@@ -13,20 +13,19 @@ A modern, high-performance Systematic Investment Plan (SIP) calculator and finan
    - **Target Goal Solver**: Reverse-engineers the exact monthly SIP needed to reach a specific wealth milestone (e.g., ₹1 Crore or $1M).
 
 2. **Real Purchasing Power (Inflation Adjustment)**:
-   - Evaluates future portfolio returns against inflation (e.g., 6% RBI benchmark), giving users a realistic assessment of future buying power.
+   - Evaluates future portfolio returns against inflation, giving users a realistic assessment of future buying power.
 
 3. **Wealth Milestones & Opportunity Cost Comparison**:
    - Compares equity mutual funds against Fixed Deposits (FD), Gold, Savings Accounts, and Cash.
-   - Automatically calculates milestones (₹10 Lakhs, ₹50 Lakhs, ₹1 Crore, ₹5 Crores).
+   - Automatically calculates milestones (₹10 Lakhs, ₹50 Lakhs, ₹1 Crore, ₹5 Crores or $100k, $500k, $1M).
 
-4. **Dedicated 24/7 Live Analytics Dashboard (`analytics.html`)**:
+4. **Multi-Currency Support**:
+   - Dynamic switching across INR (₹), USD ($), EUR (€), and GBP (£) with localized ranges, presets, and tick marks.
+
+5. **Dedicated 24/7 Live Analytics Dashboard (`analytics.html`)**:
    - Real-time global view counters.
-   - Total calculations executed and average wealth modeled.
+   - Universal SHA-256 owner master password protection.
    - Device breakdowns, traffic channels, and recent event streams.
-
-5. **Monetization & Ad-Ready Layout**:
-   - Pre-configured ad placements (Leaderboard 728x90, Mid-Content, and Mobile responsive).
-   - Easy toggle configuration in `js/ads-config.js` for Google AdSense and financial affiliate links.
 
 6. **Instant Export & Sharing**:
    - Encodes state into URL parameters for instant social sharing.
@@ -34,25 +33,17 @@ A modern, high-performance Systematic Investment Plan (SIP) calculator and finan
 
 ---
 
-## 🚀 Free 24/7 Deployment (GitHub Pages)
+## 🚀 Free 24/7 Deployment
 
-This project has zero server dependencies and runs completely on client-side compute, making it 100% free with 99.99% uptime and capable of handling thousands of concurrent users:
+### 1. Deploy on Vercel (`smartsip.vercel.app`)
+1. Import the repository `Akash-JRaj/sip-wealth-calculator` on [vercel.com/new](https://vercel.com/new).
+2. Set the Project Name to `smartsip`.
+3. Click **Deploy**. Your app will be live at `https://smartsip.vercel.app/`!
 
-1. Push this repository to GitHub.
-2. Navigate to your repository **Settings** > **Pages**.
-3. Under **Build and deployment**, set **Source** to `GitHub Actions` (or deploy from branch `main` / root).
-4. Your website is live at `https://<username>.github.io/<repo-name>/`!
-
----
-
-## 📈 Monetization Guide
-
-1. **Google AdSense**:
-   - Once your website receives initial organic visitors, submit your URL to Google AdSense.
-   - Open `js/ads-config.js`, set `enabled: true`, and add your `publisherId`.
-2. **Affiliate Partner Cards**:
-   - Direct mutual fund brokers (Zerodha, Groww, Vanguard, etc.) provide referral affiliate links paying per verified signup.
-   - Update partner links directly inside `js/ads-config.js`.
+### 2. GitHub Pages
+1. Navigate to your repository **Settings** > **Pages**.
+2. Under **Build and deployment**, set **Source** to `Deploy from a branch` (branch: `main`, folder: `/ (root)`).
+3. The site is live at `https://<username>.github.io/<repo-name>/`.
 
 ---
 

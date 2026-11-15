@@ -1,0 +1,16 @@
+{
+  "name": "smartsip",
+  "version": "1.0.0",
+  "description": "Smart SIP Wealth & Step-Up Calculator",
+  "scripts": {
+    "test": "node tests/calculator.test.js"
+  },
+  "keywords": [
+    "sip",
+    "calculator",
+    "wealth",
+    "investment"
+  ],
+  "author": "Akash Jayaraj",
+  "license": "MIT"
+}
