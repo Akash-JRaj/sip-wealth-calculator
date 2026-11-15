@@ -348,15 +348,16 @@
         { label: '₹10 Crores (Generational Wealth)', value: 100000000 }
       ];
     } else {
+      const sym = currency === 'EUR' ? '€' : (currency === 'GBP' ? '£' : '$');
       targets = [
-        { label: '$25,000 (Starter Fund)', value: 25000 },
-        { label: '$50,000 (Emergency Safety)', value: 50000 },
-        { label: '$100,000 (The Hardest First $100k)', value: 100000 },
-        { label: '$250,000 (Solid Foundation)', value: 250000 },
-        { label: '$500,000 (Half Millionaire)', value: 500000 },
-        { label: '$1,000,000 (Millionaire Status)', value: 1000000 },
-        { label: '$2,500,000 (Coast FIRE)', value: 2500000 },
-        { label: '$5,000,000 (Financial Independence)', value: 5000000 }
+        { label: `${sym}25,000 (Starter Fund)`, value: 25000 },
+        { label: `${sym}50,000 (Emergency Safety)`, value: 50000 },
+        { label: `${sym}100,000 (The First 100k)`, value: 100000 },
+        { label: `${sym}250,000 (Solid Foundation)`, value: 250000 },
+        { label: `${sym}500,000 (Half Million)`, value: 500000 },
+        { label: `${sym}1,000,000 (Millionaire Club)`, value: 1000000 },
+        { label: `${sym}2,500,000 (Coast FIRE)`, value: 2500000 },
+        { label: `${sym}5,000,000 (Financial Freedom)`, value: 5000000 }
       ];
     }
 

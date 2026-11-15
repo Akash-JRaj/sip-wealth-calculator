@@ -51,56 +51,27 @@
         </svg>
       </div>
 
-      <!-- State 1: Normal Login -->
-      <div id="loginView">
-        <h1 class="text-2xl font-extrabold text-white mb-2">Owner Security Gate</h1>
-        <p class="text-xs sm:text-sm text-slate-400 mb-6">
-          Access is restricted to the site owner. Please enter your secret master passcode.
-        </p>
+      <h1 class="text-2xl font-extrabold text-white mb-2">Owner Security Gate</h1>
+      <p class="text-xs sm:text-sm text-slate-400 mb-6">
+        Universal owner access. Enter your master passcode to access the live dashboard from any device.
+      </p>
 
-        <form id="authForm" class="space-y-4">
-          <div>
-            <input id="adminPinInput" type="password" maxlength="32" placeholder="Enter Your Master Passcode" autocomplete="current-password" autofocus
-              class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-center text-lg tracking-widest font-mono text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
-            <div id="authErrorMsg" class="text-xs text-rose-400 mt-2 hidden font-semibold">
-              Incorrect passcode. Access denied.
-            </div>
+      <form id="authForm" class="space-y-4">
+        <div>
+          <input id="adminPinInput" type="password" maxlength="32" placeholder="Enter Master Passcode" autocomplete="current-password" autofocus
+            class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-center text-lg tracking-widest font-mono text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
+          <div id="authErrorMsg" class="text-xs text-rose-400 mt-2 hidden font-semibold">
+            Incorrect passcode. Access denied.
           </div>
+        </div>
 
-          <button id="btnUnlock" type="submit" class="w-full py-3 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm shadow-lg shadow-indigo-600/30 transition-all">
-            Unlock Dashboard
-          </button>
-        </form>
-      </div>
-
-      <!-- State 2: First Time Setup (if pin_hash is UNSET) -->
-      <div id="setupView" class="hidden">
-        <h1 class="text-2xl font-extrabold text-emerald-400 mb-2">Owner Passcode Setup</h1>
-        <p class="text-xs sm:text-sm text-slate-300 mb-6">
-          Welcome Akash! Create your private master passcode now. It will be encrypted and saved on the cloud permanently so only you can access this page.
-        </p>
-
-        <form id="setupForm" class="space-y-4">
-          <div>
-            <input id="newPinInput" type="password" minlength="4" maxlength="32" placeholder="Choose Master Passcode (min 4 chars)" required
-              class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-center text-sm font-mono text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all">
-          </div>
-          <div>
-            <input id="confirmPinInput" type="password" minlength="4" maxlength="32" placeholder="Confirm Master Passcode" required
-              class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-center text-sm font-mono text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all">
-            <div id="setupErrorMsg" class="text-xs text-rose-400 mt-2 hidden font-semibold">
-              Passcodes do not match.
-            </div>
-          </div>
-
-          <button type="submit" class="w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm shadow-lg shadow-emerald-600/30 transition-all">
-            Save Private Master Passcode
-          </button>
-        </form>
-      </div>
+        <button id="btnUnlock" type="submit" class="w-full py-3 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm shadow-lg shadow-indigo-600/30 transition-all">
+          Unlock Dashboard
+        </button>
+      </form>
 
       <div class="mt-6 pt-5 border-t border-slate-800 text-xs text-slate-500 flex items-center justify-between">
-        <span>Cloud-Encrypted (SHA-256)</span>
+        <span>Protected by SHA-256</span>
         <a href="index.html" class="hover:text-slate-300 transition-colors">← Return to Calculator</a>
       </div>
 
@@ -205,7 +176,7 @@
         <!-- KPI 3: Total Wealth Modeled -->
         <div class="glass-panel-elevated p-5 rounded-2xl border border-slate-800 relative overflow-hidden">
           <div class="flex items-center justify-between text-xs text-slate-400 mb-2 font-medium">
-            <span>Total Wealth Projected</span>
+            <span>Total Wealth Modeled</span>
             <span class="w-7 h-7 rounded-lg bg-amber-500/10 text-amber-400 flex items-center justify-center">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
             </span>
@@ -230,7 +201,7 @@
             Protected
           </div>
           <div class="mt-2 text-[11px] text-cyan-400 flex items-center gap-1 font-semibold">
-            <span>Cloud SHA-256 Auth</span>
+            <span>Universal SHA-256 Auth</span>
           </div>
         </div>
 
@@ -303,18 +274,11 @@
       'use strict';
 
       const authGatekeeper = document.getElementById('authGatekeeper');
-      const loginView = document.getElementById('loginView');
-      const setupView = document.getElementById('setupView');
       const dashboardContent = document.getElementById('dashboardContent');
-
       const authForm = document.getElementById('authForm');
       const adminPinInput = document.getElementById('adminPinInput');
       const authErrorMsg = document.getElementById('authErrorMsg');
-
-      const setupForm = document.getElementById('setupForm');
-      const newPinInput = document.getElementById('newPinInput');
-      const confirmPinInput = document.getElementById('confirmPinInput');
-      const setupErrorMsg = document.getElementById('setupErrorMsg');
+      const btnUnlock = document.getElementById('btnUnlock');
 
       const btnLockDashboard = document.getElementById('btnLockDashboard');
       const btnChangePin = document.getElementById('btnChangePin');
@@ -324,20 +288,13 @@
       let trafficChartInstance = null;
       let modesChartInstance = null;
 
-      async function checkInitialState() {
+      function checkInitialState() {
         if (SIPAnalytics.isSessionAuthenticated()) {
           unlockDashboard();
-          return;
-        }
-
-        // Check if cloud pin is unset
-        const cloud = await SIPAnalytics.fetchCloudData();
-        if (!cloud.pin_hash || cloud.pin_hash === 'UNSET') {
-          loginView.classList.add('hidden');
-          setupView.classList.remove('hidden');
         } else {
-          loginView.classList.remove('hidden');
-          setupView.classList.add('hidden');
+          authGatekeeper.classList.remove('hidden');
+          dashboardContent.classList.add('hidden');
+          adminPinInput.value = '';
           adminPinInput.focus();
         }
       }
@@ -354,13 +311,12 @@
         const pin = (adminPinInput.value || '').trim();
         if (!pin) return;
 
-        const btn = document.getElementById('btnUnlock');
-        btn.textContent = 'Verifying...';
-        btn.disabled = true;
+        btnUnlock.textContent = 'Verifying...';
+        btnUnlock.disabled = true;
 
         try {
-          const res = await SIPAnalytics.verifyPasscode(pin);
-          if (res.status === 'SUCCESS') {
+          const ok = await SIPAnalytics.verifyPasscode(pin);
+          if (ok) {
             authErrorMsg.classList.add('hidden');
             unlockDashboard();
           } else {
@@ -369,37 +325,10 @@
             setTimeout(() => adminPinInput.classList.remove('border-rose-500'), 1500);
           }
         } catch (err) {
-          alert('Network verification error. Please retry.');
+          alert('Verification error. Please retry.');
         } finally {
-          btn.textContent = 'Unlock Dashboard';
-          btn.disabled = false;
-        }
-      });
-
-      // Handle Setup
-      setupForm.addEventListener('submit', async function (e) {
-        e.preventDefault();
-        const p1 = (newPinInput.value || '').trim();
-        const p2 = (confirmPinInput.value || '').trim();
-
-        if (p1 !== p2) {
-          setupErrorMsg.textContent = 'Passcodes do not match.';
-          setupErrorMsg.classList.remove('hidden');
-          return;
-        }
-        if (p1.length < 4) {
-          setupErrorMsg.textContent = 'Passcode must be at least 4 characters.';
-          setupErrorMsg.classList.remove('hidden');
-          return;
-        }
-
-        setupErrorMsg.classList.add('hidden');
-        try {
-          await SIPAnalytics.setupMasterPasscode(p1);
-          alert('Master passcode established and saved to the cloud! Only you know this passcode.');
-          unlockDashboard();
-        } catch (err) {
-          alert('Error saving passcode to cloud: ' + err.message);
+          btnUnlock.textContent = 'Unlock Dashboard';
+          btnUnlock.disabled = false;
         }
       });
 
@@ -424,8 +353,8 @@
         }
 
         try {
-          await SIPAnalytics.changeMasterPasscode(current, newP);
-          alert('Master passcode successfully updated on the cloud across all devices!');
+          const newHash = await SIPAnalytics.updateMasterPasscode(current, newP);
+          alert('Passcode updated for this device! (New SHA-256 Hash: ' + newHash + ')');
         } catch (err) {
           alert('Failed to change passcode: ' + err.message);
         }
@@ -436,22 +365,18 @@
       btnClearLocal.addEventListener('click', function () {
         SIPAnalytics.resetLocalCacheOnly();
         refreshDashboard();
-        alert('Browser session cache cleared. Cloud metrics reloaded.');
+        alert('Browser session cache reset. Live cloud metrics reloaded.');
       });
 
       async function refreshDashboard() {
-        const cloud = await SIPAnalytics.fetchCloudData();
+        const metrics = await SIPAnalytics.fetchGlobalMetrics();
         const local = SIPAnalytics.getLocalStore();
 
-        const realVisits = cloud.visits || 0;
-        const realCalcs = cloud.calcs || 0;
-        const realWealth = cloud.wealth || 0;
+        document.getElementById('statTotalVisits').textContent = Number(metrics.visits).toLocaleString();
+        document.getElementById('statTotalCalculations').textContent = Number(metrics.calculations).toLocaleString();
+        document.getElementById('statTotalWealth').textContent = SIPCalculatorEngine.formatCurrency(metrics.wealth || 0, 'INR', true);
 
-        document.getElementById('statTotalVisits').textContent = Number(realVisits).toLocaleString();
-        document.getElementById('statTotalCalculations').textContent = Number(realCalcs).toLocaleString();
-        document.getElementById('statTotalWealth').textContent = SIPCalculatorEngine.formatCurrency(realWealth, 'INR', true);
-
-        renderTrafficChart(realVisits, realCalcs);
+        renderTrafficChart(metrics.visits, metrics.calculations);
         renderModesChart(local.modesUsed);
         renderDeviceBreakdown(local.devices);
         renderSourcesBreakdown(local.trafficSources);

@@ -46,6 +46,11 @@
 
     if (donutChartInstance) {
       donutChartInstance.data = data;
+      donutChartInstance.options.plugins.tooltip.callbacks.label = function (context) {
+        const val = context.raw || 0;
+        const formatted = SIPCalculatorEngine.formatCurrency(val, currency, false);
+        return ` ${context.label.split(' ')[0]}: ${formatted}`;
+      };
       donutChartInstance.update();
       return donutChartInstance;
     }
@@ -162,6 +167,26 @@
 
     if (growthChartInstance) {
       growthChartInstance.data = data;
+      growthChartInstance.options.scales.y.ticks.callback = function (value) {
+        return SIPCalculatorEngine.formatCurrency(value, currency, true);
+      };
+      growthChartInstance.options.plugins.tooltip.callbacks.label = function (context) {
+        const val = context.raw || 0;
+        const formatted = SIPCalculatorEngine.formatCurrency(val, currency, false);
+        return ` ${context.dataset.label}: ${formatted}`;
+      };
+      growthChartInstance.options.plugins.tooltip.callbacks.footer = function (tooltipItems) {
+        let total = 0;
+        for (const item of tooltipItems) {
+          if (item.dataset.type === 'bar') {
+            total += item.raw;
+          }
+        }
+        if (total > 0) {
+          return `Total Projected Value: ${SIPCalculatorEngine.formatCurrency(total, currency, false)}`;
+        }
+        return '';
+      };
       growthChartInstance.update();
       return growthChartInstance;
     }

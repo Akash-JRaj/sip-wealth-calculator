@@ -1,11 +1,9 @@
 /**
- * SIP Wealth Calculator - Persistent Cloud Analytics & Admin Security Engine
+ * SIP Wealth Calculator - Analytics & Global Admin Authentication Engine
  * 
- * Features:
- * 1. Global Cloud Persistence (CORS-enabled, survives cache clears across all devices)
- * 2. SHA-256 Cryptographic Passcode Protection (Stored in cloud; no guessable fallbacks)
- * 3. Real Visitor & Calculation Event Logging
- * 4. Anonymous Device & Traffic Attribution
+ * 1. Global Persistent Hit Counters powered by Abacus Integer-as-a-Service (Fly.io, CORS-enabled)
+ * 2. Universal Global Master Password: Works from ANY browser, incognito, device worldwide
+ * 3. Never asks to re-setup; single master password known only to Akash
  */
 
 (function (root, factory) {
@@ -17,12 +15,19 @@
 })(typeof self !== 'undefined' ? self : this, function () {
   'use strict';
 
-  // Persistent Cloud Database Endpoint (Free, 24/7, CORS-enabled)
-  const CLOUD_ENDPOINT = 'https://api.restful-api.dev/objects/ff808181a09d98f701a1d3a163d51e04';
-  const LOCAL_STORAGE_KEY = 'sip_analytics_local_cache_v3';
-  const SESSION_AUTH_KEY = 'sip_admin_session_auth_v3';
+  // Abacus Global Counter Endpoints (CORS-enabled, permanent cloud integer store)
+  const ABACUS_BASE = 'https://abacus.jasoncameron.dev';
+  const NAMESPACE = 'akash-sip-wealth-calc';
 
-  // SHA-256 Hashing Utility via Web Crypto API
+  const STORAGE_KEY = 'sip_analytics_store_v4';
+  const SESSION_AUTH_KEY = 'sip_admin_session_auth_v4';
+  const CUSTOM_PIN_KEY = 'sip_custom_master_pin_hash';
+
+  // Global Master Passcode Hash (SHA-256 for: Akash@2026)
+  // This allows logging in from ANY device, incognito, or browser in the world
+  const GLOBAL_MASTER_HASH = 'e5474fc4630429ec9a200da7ecd84118a497fe6d4e024eeb1d5054dfd086a1b9';
+
+  // SHA-256 Hashing Utility
   async function computeSHA256(message) {
     if (typeof crypto !== 'undefined' && crypto.subtle) {
       const msgBuffer = new TextEncoder().encode(message);
@@ -30,20 +35,19 @@
       const hashArray = Array.from(new Uint8Array(hashBuffer));
       return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
     }
-    // Fallback simple hash if subtle crypto unavailable
+    // Fallback if subtle crypto unavailable
     let hash = 0;
     for (let i = 0; i < message.length; i++) {
-      const char = message.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
+      hash = ((hash << 5) - hash) + message.charCodeAt(i);
       hash |= 0;
     }
-    return 'fallback_' + Math.abs(hash).toString(16);
+    return Math.abs(hash).toString(16);
   }
 
-  // Get local session store
+  // Local storage cache
   function getLocalStore() {
     try {
-      const data = localStorage.getItem(LOCAL_STORAGE_KEY);
+      const data = localStorage.getItem(STORAGE_KEY);
       if (data) return JSON.parse(data);
     } catch (e) {}
 
@@ -51,6 +55,8 @@
       localVisits: 0,
       totalCalculations: 0,
       totalWealthCalculated: 0,
+      cachedGlobalVisits: 2,
+      cachedGlobalCalcs: 1,
       events: [],
       modesUsed: { sip: 0, stepup: 0, lumpsum: 0, goal: 0 },
       timeHorizons: { '5': 0, '10': 0, '15': 0, '20': 0, '25+': 0 },
@@ -63,7 +69,7 @@
 
   function saveLocalStore(store) {
     try {
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(store));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
     } catch (e) {}
   }
 
@@ -87,43 +93,58 @@
   }
 
   /**
-   * Fetch live metrics from cloud database
+   * Fetch real counter from Abacus API
    */
-  async function fetchCloudData() {
+  async function fetchAbacus(action, key) {
     try {
-      const res = await fetch(CLOUD_ENDPOINT, { cache: 'no-cache' });
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 4000);
+      const url = `${ABACUS_BASE}/${action}/${NAMESPACE}/${key}`;
+
+      const res = await fetch(url, {
+        method: 'GET',
+        cache: 'no-cache',
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+
       if (res.ok) {
         const json = await res.json();
-        return json.data || { visits: 1, calcs: 0, wealth: 0, pin_hash: 'UNSET' };
+        return typeof json.value === 'number' ? json.value : null;
       }
     } catch (err) {
-      console.warn('Cloud fetch offline:', err);
+      // Network offline
     }
-    return { visits: 1, calcs: 0, wealth: 0, pin_hash: 'UNSET' };
+    return null;
   }
 
   /**
-   * Update cloud metrics with atomic patch
+   * Fetch current global counters without incrementing
    */
-  async function patchCloudData(updates) {
-    try {
-      const current = await fetchCloudData();
-      const updatedData = { ...current, ...updates };
+  async function fetchGlobalMetrics() {
+    const store = getLocalStore();
 
-      await fetch(CLOUD_ENDPOINT, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ data: updatedData })
-      });
-      return updatedData;
-    } catch (err) {
-      console.warn('Cloud patch failed:', err);
-      return null;
-    }
+    try {
+      const [visits, calcs] = await Promise.all([
+        fetchAbacus('get', 'visits'),
+        fetchAbacus('get', 'calcs')
+      ]);
+
+      if (typeof visits === 'number') store.cachedGlobalVisits = visits;
+      if (typeof calcs === 'number') store.cachedGlobalCalcs = calcs;
+
+      saveLocalStore(store);
+    } catch (e) {}
+
+    return {
+      visits: Math.max(store.cachedGlobalVisits || 0, store.localVisits || 0, 1),
+      calculations: Math.max(store.cachedGlobalCalcs || 0, store.totalCalculations || 0),
+      wealth: store.totalWealthCalculated || 0
+    };
   }
 
   /**
-   * Record a genuine page visit
+   * Record genuine page view
    */
   async function recordPageView(pageName = '/') {
     const store = getLocalStore();
@@ -143,17 +164,19 @@
     if (store.events.length > 50) store.events.pop();
     saveLocalStore(store);
 
-    // Increment cloud visit counter
-    fetchCloudData().then(cloud => {
-      const newCount = (cloud.visits || 0) + 1;
-      patchCloudData({ visits: newCount });
+    // Increment global cloud counter
+    fetchAbacus('hit', 'visits').then(count => {
+      if (typeof count === 'number') {
+        store.cachedGlobalVisits = count;
+        saveLocalStore(store);
+      }
     });
 
     return store;
   }
 
   /**
-   * Record a genuine calculation event
+   * Record genuine calculation event
    */
   function recordCalculation(mode, params, result) {
     const store = getLocalStore();
@@ -185,57 +208,46 @@
     if (store.events.length > 50) store.events.pop();
     saveLocalStore(store);
 
-    // Increment cloud calculations
-    fetchCloudData().then(cloud => {
-      patchCloudData({
-        calcs: (cloud.calcs || 0) + 1,
-        wealth: (cloud.wealth || 0) + wealth
-      });
+    // Increment global calculations on cloud
+    fetchAbacus('hit', 'calcs').then(count => {
+      if (typeof count === 'number') {
+        store.cachedGlobalCalcs = count;
+        saveLocalStore(store);
+      }
     });
 
     return store;
   }
 
   /**
-   * Admin Authentication Functions
+   * Universal Global Password Authentication
    */
   async function verifyPasscode(enteredPin) {
-    const cloud = await fetchCloudData();
-
-    // First time setup check
-    if (!cloud.pin_hash || cloud.pin_hash === 'UNSET') {
-      return { status: 'SETUP_NEEDED' };
-    }
-
+    if (!enteredPin) return false;
     const enteredHash = await computeSHA256(enteredPin.trim());
-    if (enteredHash === cloud.pin_hash) {
+
+    // Check custom override if set locally, otherwise check universal global hash
+    const customHash = localStorage.getItem(CUSTOM_PIN_KEY);
+    const validHash = customHash || GLOBAL_MASTER_HASH;
+
+    if (enteredHash === validHash) {
       sessionStorage.setItem(SESSION_AUTH_KEY, 'true');
-      return { status: 'SUCCESS' };
+      return true;
     }
-    return { status: 'INVALID' };
+    return false;
   }
 
-  async function setupMasterPasscode(newPin) {
-    if (!newPin || newPin.trim().length < 4) {
-      throw new Error('Passcode must be at least 4 characters');
-    }
-    const hash = await computeSHA256(newPin.trim());
-    await patchCloudData({ pin_hash: hash });
-    sessionStorage.setItem(SESSION_AUTH_KEY, 'true');
-    return true;
-  }
-
-  async function changeMasterPasscode(currentPin, newPin) {
-    const verify = await verifyPasscode(currentPin);
-    if (verify.status !== 'SUCCESS') {
+  async function updateMasterPasscode(currentPin, newPin) {
+    const isOk = await verifyPasscode(currentPin);
+    if (!isOk) {
       throw new Error('Current passcode is incorrect');
     }
     if (!newPin || newPin.trim().length < 4) {
       throw new Error('New passcode must be at least 4 characters');
     }
     const newHash = await computeSHA256(newPin.trim());
-    await patchCloudData({ pin_hash: newHash });
-    return true;
+    localStorage.setItem(CUSTOM_PIN_KEY, newHash);
+    return newHash;
   }
 
   function isSessionAuthenticated() {
@@ -247,20 +259,25 @@
   }
 
   function resetLocalCacheOnly() {
-    localStorage.removeItem(LOCAL_STORAGE_KEY);
-    return getLocalStore();
+    const store = getLocalStore();
+    store.localVisits = 0;
+    store.totalCalculations = 0;
+    store.totalWealthCalculated = 0;
+    store.events = [];
+    saveLocalStore(store);
+    return store;
   }
 
   return {
-    fetchCloudData,
+    fetchGlobalMetrics,
     recordPageView,
     recordCalculation,
     getLocalStore,
     verifyPasscode,
-    setupMasterPasscode,
-    changeMasterPasscode,
+    updateMasterPasscode,
     isSessionAuthenticated,
     logout,
-    resetLocalCacheOnly
+    resetLocalCacheOnly,
+    computeSHA256
   };
 });

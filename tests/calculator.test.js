@@ -50,6 +50,18 @@ console.log('✅ Test 6 Passed: Asset class comparisons & milestone detection fu
 assert.strictEqual(engine.formatCurrency(12500000, 'INR', true), '₹1.25 Cr');
 assert.strictEqual(engine.formatCurrency(500000, 'INR', true), '₹5.00 L');
 assert.strictEqual(engine.formatCurrency(1500000, 'USD', true), '$1.50M');
-console.log('✅ Test 7 Passed: Multi-currency & compact Indian numbering format functional\n');
+console.log('✅ Test 7 Passed: Multi-currency & compact Indian numbering format functional');
 
-console.log('🎉 All 7 unit test suites passed perfectly!');
+// Test 8: Multi-currency milestones
+const usdMilestones = engine.calculateMilestones(test1.schedule, 'USD');
+assert(usdMilestones.length > 0);
+assert(usdMilestones[0].label.startsWith('$'));
+const eurMilestones = engine.calculateMilestones(test1.schedule, 'EUR');
+assert(eurMilestones.length > 0);
+assert(eurMilestones[0].label.startsWith('€'));
+const gbpMilestones = engine.calculateMilestones(test1.schedule, 'GBP');
+assert(gbpMilestones.length > 0);
+assert(gbpMilestones[0].label.startsWith('£'));
+console.log('✅ Test 8 Passed: Currency symbols in milestones dynamically adapted for $, €, £, ₹\n');
+
+console.log('🎉 All 8 unit test suites passed perfectly!');
