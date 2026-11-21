@@ -14,5 +14,18 @@ services:
       - lgtm-data:/data
     restart: unless-stopped
 
+  traffic-generator:
+    image: node:22-alpine
+    container_name: sip-traffic-generator
+    working_dir: /app
+    volumes:
+      - .:/app
+    environment:
+      - OTLP_COLLECTOR_URL=http://otel-lgtm:4318
+    command: ["node", "scripts/traffic-generator.js", "--loop"]
+    depends_on:
+      - otel-lgtm
+    restart: unless-stopped
+
 volumes:
   lgtm-data:

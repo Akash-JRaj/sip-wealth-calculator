@@ -12,8 +12,15 @@
 
 const http = require('http');
 
-const COLLECTOR_HOST = '127.0.0.1';
-const COLLECTOR_PORT = 4318;
+let collectorUrl;
+try {
+  collectorUrl = new URL(process.env.OTLP_COLLECTOR_URL || 'http://127.0.0.1:4318');
+} catch (e) {
+  collectorUrl = new URL('http://127.0.0.1:4318');
+}
+
+const COLLECTOR_HOST = process.env.COLLECTOR_HOST || collectorUrl.hostname || '127.0.0.1';
+const COLLECTOR_PORT = parseInt(process.env.COLLECTOR_PORT || collectorUrl.port || '4318', 10);
 const SERVICE_NAME = 'sip-calculator';
 
 const CURRENCIES = ['INR', 'USD', 'EUR', 'GBP'];

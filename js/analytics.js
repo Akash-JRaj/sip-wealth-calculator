@@ -18,6 +18,7 @@
   // Abacus Global Counter Endpoints (CORS-enabled, permanent cloud integer store)
   const ABACUS_BASE = 'https://abacus.jasoncameron.dev';
   const NAMESPACE = 'akash-sip-wealth-calc';
+  let isCloudCounterAvailable = true;
 
   const STORAGE_KEY = 'sip_analytics_store_v4';
   const SESSION_AUTH_KEY = 'sip_admin_session_auth_v4';
@@ -93,12 +94,13 @@
   }
 
   /**
-   * Fetch real counter from Abacus API
+   * Fetch real counter from Abacus API (with circuit breaker to prevent console errors)
    */
   async function fetchAbacus(action, key) {
+    if (!isCloudCounterAvailable) return null;
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 4000);
+      const timeoutId = setTimeout(() => controller.abort(), 1000);
       const url = `${ABACUS_BASE}/${action}/${NAMESPACE}/${key}`;
 
       const res = await fetch(url, {
@@ -111,9 +113,11 @@
       if (res.ok) {
         const json = await res.json();
         return typeof json.value === 'number' ? json.value : null;
+      } else {
+        isCloudCounterAvailable = false;
       }
     } catch (err) {
-      // Network offline
+      isCloudCounterAvailable = false;
     }
     return null;
   }

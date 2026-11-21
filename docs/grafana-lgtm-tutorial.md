@@ -36,23 +36,32 @@ Welcome to your hands-on guide for learning **Grafana**, **OpenTelemetry (OTel)*
 
 ## 2. Quick Start Commands
 
-### A. Start the LGTM Container
-The container is configured via `docker-compose.yml`:
+### A. Start the LGTM Stack & Auto-Traffic Generator
+The stack is configured via `docker-compose.yml`, which starts both the `otel-lgtm` container and an automated background `traffic-generator`:
 ```bash
 docker compose up -d
 ```
 - **Grafana UI**: [http://localhost:3000](http://localhost:3000)
 - **Login Credentials**: Username `admin`, Password `admin`
 - **OTel HTTP Receiver**: `http://localhost:4318`
+- **Live Background Traffic**: Runs automatically so your Grafana dashboards are continuously populated!
 
-### B. Generate Live Traffic & Telemetry
-In your terminal, run the simulated traffic generator to populate your dashboards with real-time events:
+### B. Run the Calculator Locally (Zero Mixed-Content Restriction)
+To test browser interactions with your local Grafana stack, run the local HTTP dev server:
 ```bash
-# Send a burst of 25 calculations
-node scripts/traffic-generator.js --burst 25
+npm start
+```
+- **Local Calculator**: [http://localhost:8080](http://localhost:8080)
+- **Why `http://localhost:8080`?**
+  When visiting the public production URL (`https://akash-jraj.github.io`), modern browsers block calls to `http://localhost:4318` under browser **Mixed Content (HTTPS to HTTP)** security rules. Running locally over `http://` allows your browser to send traces, metrics, and logs directly to the local collector on port 4318 without any errors!
 
-# Or run continuously in the background (1 calculation every 1.2s):
-node scripts/traffic-generator.js --loop
+### C. Manual / CLI Traffic Generator (Optional)
+```bash
+# Send a burst of 25 calculations across currencies:
+npm run telemetry:gen
+
+# Or stream continuously in your terminal:
+npm run telemetry:watch
 ```
 
 ### C. Open the Pre-Configured Dashboard

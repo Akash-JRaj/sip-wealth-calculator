@@ -170,12 +170,12 @@
         {
           "datasource": { "type": "loki", "uid": "loki" },
           "editorMode": "code",
-          "expr": "count_over_time({service_name=\"sip-calculator\"}[15m])",
+          "expr": "count_over_time({service_name=\"sip-calculator\"}[1h])",
           "queryType": "instant",
           "refId": "A"
         }
       ],
-      "title": "Loki Logs Ingested (15m)",
+      "title": "Loki Logs Ingested (1h)",
       "type": "stat"
     },
     {
@@ -343,7 +343,7 @@
   "schemaVersion": 38,
   "style": "dark",
   "tags": ["sip-calculator", "opentelemetry", "lgtm", "tempo", "loki", "mimir"],
-  "time": { "from": "now-15m", "to": "now" },
+  "time": { "from": "now-1h", "to": "now" },
   "timepicker": {
     "refresh_intervals": ["5s", "10s", "30s", "1m"],
     "time_options": ["5m", "15m", "1h", "6h", "24h"]

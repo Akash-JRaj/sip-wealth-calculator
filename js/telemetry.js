@@ -13,6 +13,8 @@
   const SERVICE_NAME = 'sip-calculator';
   const SERVICE_VERSION = '1.0.0';
 
+  const isHttps = window.location.protocol === 'https:';
+
   let isCollectorAlive = false;
   let checkInProgress = false;
   let calculationDebounceTimer = null;
@@ -64,20 +66,30 @@
   async function testCollectorHealth() {
     if (checkInProgress) return isCollectorAlive;
     checkInProgress = true;
+
+    // Mixed content protection: If running on HTTPS (e.g. GitHub Pages or Vercel),
+    // modern browsers forbid plain HTTP fetch to localhost.
+    if (isHttps && DEFAULT_COLLECTOR_URL.startsWith('http://')) {
+      isCollectorAlive = false;
+      checkInProgress = false;
+      updateUiBadge('https_warning');
+      return false;
+    }
+
     try {
       // Lightweight pre-flight probe
       const res = await fetch(`${DEFAULT_COLLECTOR_URL}/v1/traces`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ resourceSpans: [] }),
-        signal: AbortSignal.timeout(1500)
+        signal: AbortSignal.timeout(1200)
       });
       isCollectorAlive = res.status < 500;
     } catch (e) {
       isCollectorAlive = false;
     } finally {
       checkInProgress = false;
-      updateUiBadge();
+      updateUiBadge(isCollectorAlive ? 'active' : 'offline');
     }
     return isCollectorAlive;
   }
@@ -86,7 +98,7 @@
    * Send JSON payload to OTLP endpoint safely
    */
   async function sendOtlp(endpoint, payload) {
-    if (!isCollectorAlive) return;
+    if (!isCollectorAlive || isHttps) return;
     try {
       await fetch(`${DEFAULT_COLLECTOR_URL}${endpoint}`, {
         method: 'POST',
@@ -96,23 +108,31 @@
     } catch (err) {
       // If collector drops offline, flag it silently
       isCollectorAlive = false;
-      updateUiBadge();
+      updateUiBadge('offline');
     }
   }
 
   /**
    * Updates visual telemetry badge in UI if container exists
    */
-  function updateUiBadge() {
+  function updateUiBadge(status) {
     const badge = document.getElementById('otelTelemetryBadge');
     if (!badge) return;
-    if (isCollectorAlive) {
-      badge.classList.remove('hidden', 'bg-slate-800', 'text-slate-400');
-      badge.classList.add('bg-emerald-950/80', 'text-emerald-400', 'border-emerald-500/40');
+
+    if (status === 'active' || isCollectorAlive) {
+      badge.classList.remove('hidden', 'bg-slate-900', 'text-slate-400', 'border-slate-800');
+      badge.classList.add('flex', 'bg-emerald-950/80', 'text-emerald-400', 'border-emerald-500/40');
       badge.innerHTML = `
         <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
         <span>LGTM Telemetry Active</span>
-        <a href="http://localhost:3000" target="_blank" class="ml-1 underline text-[10px] text-emerald-300 hover:text-white" title="Open Grafana">Grafana ↗</a>
+        <a href="http://localhost:3000/d/smart-sip-lgtm/smart-sip-full-lgtm-observability-dashboard" target="_blank" class="ml-1 underline text-[10px] text-emerald-300 hover:text-white" title="Open Grafana">Grafana ↗</a>
+      `;
+    } else if (status === 'https_warning' || isHttps) {
+      badge.classList.remove('hidden', 'bg-emerald-950/80', 'text-emerald-400', 'border-emerald-500/40');
+      badge.classList.add('flex', 'bg-slate-900/90', 'text-slate-400', 'border-slate-700/80');
+      badge.innerHTML = `
+        <span class="w-2 h-2 rounded-full bg-indigo-400"></span>
+        <span>Local LGTM: Run <code>npm start</code> for live browser telemetry</span>
       `;
     } else {
       badge.classList.add('hidden');
