@@ -111,10 +111,13 @@
         </div>
       </a>
 
-      <!-- Header Center: Live Activity Badge (Public Display Only) -->
-      <div class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900/90 border border-slate-700/80 text-xs text-slate-300">
-        <span class="w-2 h-2 rounded-full bg-emerald-400 pulse-dot"></span>
-        <span class="text-slate-300 font-medium">Free 24/7 Verified Wealth Planner</span>
+      <!-- Header Center: Live Activity Badge & OTel Badge -->
+      <div class="hidden md:flex items-center gap-2">
+        <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900/90 border border-slate-700/80 text-xs text-slate-300">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 pulse-dot"></span>
+          <span class="text-slate-300 font-medium">Free 24/7 Verified Wealth Planner</span>
+        </div>
+        <div id="otelTelemetryBadge" class="hidden items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all"></div>
       </div>
 
       <!-- Header Right: Currency Selector -->
@@ -671,6 +674,7 @@
   </div>
 
   <!-- Scripts -->
+  <script src="js/telemetry.js"></script>
   <script src="js/calculator.js"></script>
   <script src="js/analytics.js"></script>
   <script src="js/charts.js"></script>

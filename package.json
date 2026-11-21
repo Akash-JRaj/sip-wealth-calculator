@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "Smart SIP Wealth & Step-Up Calculator",
   "scripts": {
-    "test": "node tests/calculator.test.js"
+    "test": "node tests/calculator.test.js",
+    "telemetry:gen": "node scripts/traffic-generator.js --burst 25",
+    "telemetry:watch": "node scripts/traffic-generator.js --loop"
   },
   "keywords": [
     "sip",

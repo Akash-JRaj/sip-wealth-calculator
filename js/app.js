@@ -304,6 +304,10 @@
     state.currency = newCurrency;
     const cfg = CURRENCY_CONFIGS[newCurrency] || CURRENCY_CONFIGS.INR;
 
+    if (!isInitial && oldCurrency !== newCurrency && window.SIPTelemetry) {
+      window.SIPTelemetry.recordCurrencySwitch(oldCurrency, newCurrency);
+    }
+
     // Adjust values if changing between INR and non-INR
     if (!isInitial && ((oldCurrency === 'INR' && newCurrency !== 'INR') || (oldCurrency !== 'INR' && newCurrency === 'INR'))) {
       state.monthlyInvestment = cfg.monthly.default;
@@ -545,6 +549,21 @@
     if (window.SIPAnalytics) {
       SIPAnalytics.recordCalculation(state.mode, state, result);
     }
+
+    if (window.SIPTelemetry) {
+      window.SIPTelemetry.recordCalculation({
+        mode: state.mode,
+        currency: state.currency,
+        monthlyInvestment: state.mode === 'lumpsum' ? state.principal : (state.mode === 'goal' ? (result.monthlyInvestment || 0) : state.monthlyInvestment),
+        principal: state.principal,
+        years: state.years,
+        annualRate: state.annualRate,
+        stepUpPercent: state.stepUpPercent,
+        totalInvested: result.totalInvested,
+        totalValue: result.totalValue,
+        estimatedReturns: result.estimatedReturns
+      });
+    }
   }
 
   function renderMilestones(schedule) {
@@ -749,6 +768,10 @@
 
     if (window.SIPAnalytics) {
       SIPAnalytics.recordPageView('/');
+    }
+
+    if (window.SIPTelemetry) {
+      window.SIPTelemetry.recordPageView('calculator');
     }
   }
 

@@ -223,7 +223,10 @@
    * Universal Global Password Authentication
    */
   async function verifyPasscode(enteredPin) {
-    if (!enteredPin) return false;
+    if (!enteredPin) {
+      if (window.SIPTelemetry) window.SIPTelemetry.recordAuthAttempt('failure', 'Empty passcode');
+      return false;
+    }
     const enteredHash = await computeSHA256(enteredPin.trim());
 
     // Check custom override if set locally, otherwise check universal global hash
@@ -232,8 +235,10 @@
 
     if (enteredHash === validHash) {
       sessionStorage.setItem(SESSION_AUTH_KEY, 'true');
+      if (window.SIPTelemetry) window.SIPTelemetry.recordAuthAttempt('success');
       return true;
     }
+    if (window.SIPTelemetry) window.SIPTelemetry.recordAuthAttempt('failure', 'Invalid passcode hash');
     return false;
   }
 
