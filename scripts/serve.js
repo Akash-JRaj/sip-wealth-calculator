@@ -61,6 +61,33 @@ const server = http.createServer((req, res) => {
   }
 
   let reqPath = decodeURI(req.url.split('?')[0]);
+
+  // Local Grafana Alert Webhook Receiver
+  if (req.method === 'POST' && (reqPath === '/api/alerts' || reqPath === '/alerts')) {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', () => {
+      console.log('\n======================================================');
+      console.log('🚨 [GRAFANA ALERT RECEIVED AT LOCAL WEBHOOK]');
+      try {
+        const parsed = JSON.parse(body);
+        console.log(`Alert Title: ${parsed.title || 'Grafana Test Alert'}`);
+        console.log(`Status:      ${parsed.status || 'firing'}`);
+        if (parsed.alerts && parsed.alerts.length > 0) {
+          parsed.alerts.forEach((a, i) => {
+            console.log(` [Alert #${i+1}] ${a.labels?.alertname || 'Alert'}: ${a.annotations?.summary || a.annotations?.description || 'Triggered'}`);
+          });
+        }
+      } catch (e) {
+        console.log(body);
+      }
+      console.log('======================================================\n');
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ status: 'ok', received: true }));
+    });
+    return;
+  }
+
   if (reqPath === '/' || reqPath === '') {
     reqPath = '/index.html';
   } else if (reqPath === '/analytics') {
@@ -98,6 +125,7 @@ server.listen(PORT, () => {
   console.log('🚀 Smart SIP Calculator - Local Dev & Telemetry Server');
   console.log(`🌐 Calculator:  http://localhost:${PORT}`);
   console.log(`📊 Analytics:   http://localhost:${PORT}/analytics.html`);
+  console.log(`🔔 Alert Hook:  http://host.docker.internal:${PORT}/api/alerts`);
   console.log('📈 Grafana UI:  http://localhost:3000 (admin / admin)');
   console.log('🎯 OTel Target: http://localhost:4318 (HTTP OTLP)');
   console.log('======================================================\n');
